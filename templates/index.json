@@ -331,7 +331,7 @@
         "body_text": "Relica was born from a simple idea — to bring world-class cookware and appliances into Indian homes, crafted with the same integrity and precision that our family has upheld for generations.",
         "quote": "I saw a new India emerging — one that wanted global quality, refined design, and dependable performance, all made for the way we cook.",
         "btn_label": "Read Our Full Story",
-        "btn_url": "/pages/our-story",
+        "btn_url": "shopify://pages/about-us",
         "main_image": "shopify://shop_images/IMG_0595_baba0ee1-25ab-48d8-b6e8-bca4c7358620.jpg",
         "main_image_ratio": "4/5",
         "main_image_color": "#24436b",
@@ -451,7 +451,7 @@
             "features": "4mm thickness for even heat distribution|5-layer nonstick coating structure|PFOA free certified|Soft-touch handle — cool & comfortable|Retains original shape over years of use",
             "warranty": "",
             "btn_label": "Shop Die-Cast Series",
-            "btn_url": "/collections/die-cast"
+            "btn_url": "shopify://collections/die-cast-series"
           }
         },
         "t2": {
@@ -465,9 +465,9 @@
             "info_title_italic": "Precision",
             "info_body": "Strength, purity, and engineering excellence. Three-layer structure delivering uniform heating from base to rim with exceptional efficiency and a sleek mirror finish.",
             "features": "Food-grade stainless steel 304 inner layer|Rapid heat-conductive core|Induction-ready stainless steel 430 base|Sturdy riveted handles|Sleek mirror finish throughout",
-            "warranty": "5 Year",
+            "warranty": "",
             "btn_label": "Shop Triply Series",
-            "btn_url": "/collections/triply"
+            "btn_url": "shopify://collections/triply-series"
           }
         },
         "t3": {
@@ -481,9 +481,9 @@
             "info_title_italic": "Cooking Surface",
             "info_body": "A breakthrough hybrid cooking surface. The unique honeycomb pattern creates a stainless–nonstick fusion that minimises sticking and ensures even cooking every time.",
             "features": "Honeycomb structure — stainless-nonstick fusion|5-layer structure with food-grade SS304|Ergonomic cool-touch handles|Energy efficient heat distribution|Metal spoon friendly, easy to clean",
-            "warranty": "5 Year",
+            "warranty": "",
             "btn_label": "Shop Honeycomb Series",
-            "btn_url": "/collections/honeycomb"
+            "btn_url": "shopify://collections/honeycomb-series"
           }
         },
         "series_3dbmGg": {
@@ -533,7 +533,7 @@
             "features": "400W high-performance motor|ISI certified, 12-month warranty|Available in Black, Red, Blue & Pink|Multiple jar configurations (2J, 3J, 5J)",
             "warranty": "",
             "btn_label": "Shop Vitajet Series",
-            "btn_url": "/collections/vitajet"
+            "btn_url": "shopify://collections/vitajet-series"
           }
         }
       },
