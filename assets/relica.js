@@ -2,43 +2,13 @@
 (function () {
   'use strict';
 
-  /* ---- HERO SLIDER ---- */
-  const initHero = () => {
-    const sliders = document.querySelectorAll('.hero');
-    sliders.forEach(hero => {
-      const track = hero.querySelector('.hero-slides');
-      const slides = hero.querySelectorAll('.hero-slide');
-      const nums = hero.querySelectorAll('.hero-num');
-      const prevBtn = hero.querySelector('.hero-arr[data-dir="prev"]');
-      const nextBtn = hero.querySelector('.hero-arr[data-dir="next"]');
-      if (!track || slides.length < 2) return;
-
-      let current = 0;
-      let timer;
-      // FIX: fall back to reading data-speed from child .hero-slides if .hero has no data-auto-speed
-      const autoSpeed = parseInt(hero.dataset.autoSpeed || track.dataset.speed || 5000);
-
-      const go = (idx) => {
-        slides[current].classList.remove('active');
-        if (nums[current]) nums[current].classList.remove('active');
-        current = (idx + slides.length) % slides.length;
-        slides[current].classList.add('active');
-        if (nums[current]) nums[current].classList.add('active');
-        track.style.transform = `translateX(-${current * 100}%)`;
-      };
-
-      slides[0].classList.add('active');
-      if (nums[0]) nums[0].classList.add('active');
-
-      const startAuto = () => { timer = setInterval(() => go(current + 1), autoSpeed); };
-      const stopAuto = () => clearInterval(timer);
-
-      if (prevBtn) prevBtn.addEventListener('click', () => { stopAuto(); go(current - 1); startAuto(); });
-      if (nextBtn) nextBtn.addEventListener('click', () => { stopAuto(); go(current + 1); startAuto(); });
-      nums.forEach((num, i) => num.addEventListener('click', () => { stopAuto(); go(i); startAuto(); }));
-      startAuto();
-    });
-  };
+  /* ---- HERO SLIDER ----
+     The Hero Slider section (sections/hero-slider.liquid) ships its own
+     self-contained script that owns all slider behaviour (fade transitions,
+     autoplay setting, progress bar, product sub-slider, swipe, a11y).
+     The old translateX implementation that used to live here conflicted with
+     it — it force-started autoplay and shifted the fade-positioned track
+     off-screen — so it has been removed. Do not re-add hero logic here. */
 
   /* ---- SERIES TABS ---- */
   const initTabs = () => {
@@ -307,7 +277,6 @@
 
   /* ---- INIT ALL ---- */
   document.addEventListener('DOMContentLoaded', () => {
-    initHero();
     initTabs();
     initCartDrawer();
     initCartPage();
