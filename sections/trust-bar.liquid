@@ -1,0 +1,871 @@
+<div
+  class="tb-root"
+  id="tb-{{ section.id }}"
+  style="
+    --tb-bg: {{ section.settings.bg_color }};
+    --tb-border: {{ section.settings.border_color }};
+    --tb-icon: {{ section.settings.icon_color }};
+    --tb-label: {{ section.settings.label_color }};
+    --tb-desc: {{ section.settings.desc_color }};
+    --tb-accent: {{ section.settings.accent_color }};
+    --tb-icon-size: {{ section.settings.icon_size }}px;
+    --tb-label-size: {{ section.settings.label_size }}px;
+    --tb-desc-size: {{ section.settings.desc_size }}px;
+    --tb-radius: {{ section.settings.section_radius }}px;
+    --tb-item-radius: {{ section.settings.item_radius }}px;
+    --tb-pad-v: {{ section.settings.padding_vertical }}px;
+    --tb-pad-h: {{ section.settings.padding_horizontal }}px;
+    --tb-gap: {{ section.settings.item_gap }}px;
+    --tb-divider-op: {{ section.settings.show_dividers | default: true | json }};
+    --tb-icon-bg: {{ section.settings.icon_bg_color }};
+    --tb-icon-bg-size: {{ section.settings.icon_bg_size }}px;
+    --tb-shadow: {{ section.settings.show_shadow | default: false | json }};
+  "
+>
+  {%- if section.settings.show_grain -%}
+  <svg class="tb-grain" xmlns="http://www.w3.org/2000/svg" width="300" height="300" aria-hidden="true">
+    <filter id="tb-grain-{{ section.id }}">
+      <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+    <rect width="300" height="300" filter="url(#tb-grain-{{ section.id }})" opacity="{{ section.settings.grain_opacity | divided_by: 100.0 }}"/>
+  </svg>
+  {%- endif -%}
+
+  <div class="tb-inner">
+
+    {%- for i in (1..6) -%}
+      {%- liquid
+        assign label_key = 'label' | append: i
+        assign desc_key  = 'desc'  | append: i
+        assign icon_key  = 'icon'  | append: i
+        assign url_key   = 'url'   | append: i
+        assign lbl = section.settings[label_key]
+        assign dsc = section.settings[desc_key]
+        assign ico = section.settings[icon_key]
+      -%}
+      {%- if lbl != blank -%}
+        {%- assign url_val = section.settings[url_key] -%}
+        {%- if url_val != blank -%}
+          <a href="{{ url_val }}" class="tb-item tb-item--link tb-anim tb-anim-{{ i }}">
+        {%- else -%}
+          <div class="tb-item tb-anim tb-anim-{{ i }}">
+        {%- endif -%}
+
+          <div class="tb-icon-wrap">
+            {%- case ico -%}
+              {%- when 'shield' -%}
+                <svg width="{{ section.settings.icon_size }}" height="{{ section.settings.icon_size }}" viewBox="0 0 24 24" fill="none" stroke="var(--tb-icon)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              {%- when 'check-circle' -%}
+                <svg width="{{ section.settings.icon_size }}" height="{{ section.settings.icon_size }}" viewBox="0 0 24 24" fill="none" stroke="var(--tb-icon)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+              {%- when 'grid' -%}
+                <svg width="{{ section.settings.icon_size }}" height="{{ section.settings.icon_size }}" viewBox="0 0 24 24" fill="none" stroke="var(--tb-icon)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+              {%- when 'star' -%}
+                <svg width="{{ section.settings.icon_size }}" height="{{ section.settings.icon_size }}" viewBox="0 0 24 24" fill="none" stroke="var(--tb-icon)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              {%- when 'truck' -%}
+                <svg width="{{ section.settings.icon_size }}" height="{{ section.settings.icon_size }}" viewBox="0 0 24 24" fill="none" stroke="var(--tb-icon)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+              {%- when 'refresh' -%}
+                <svg width="{{ section.settings.icon_size }}" height="{{ section.settings.icon_size }}" viewBox="0 0 24 24" fill="none" stroke="var(--tb-icon)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>
+              {%- when 'lock' -%}
+                <svg width="{{ section.settings.icon_size }}" height="{{ section.settings.icon_size }}" viewBox="0 0 24 24" fill="none" stroke="var(--tb-icon)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              {%- when 'leaf' -%}
+                <svg width="{{ section.settings.icon_size }}" height="{{ section.settings.icon_size }}" viewBox="0 0 24 24" fill="none" stroke="var(--tb-icon)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 8C8 10 5.9 16.17 3.82 19.83M3 21c3-1 5.2-3 7-6 2.5-4 5-7 9-8 2-.5 4 0 5 1-1 3-3 5-6 6s-5.5 1-8 3z"/></svg>
+              {%- when 'award' -%}
+                <svg width="{{ section.settings.icon_size }}" height="{{ section.settings.icon_size }}" viewBox="0 0 24 24" fill="none" stroke="var(--tb-icon)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+              {%- when 'zap' -%}
+                <svg width="{{ section.settings.icon_size }}" height="{{ section.settings.icon_size }}" viewBox="0 0 24 24" fill="none" stroke="var(--tb-icon)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              {%- when 'heart' -%}
+                <svg width="{{ section.settings.icon_size }}" height="{{ section.settings.icon_size }}" viewBox="0 0 24 24" fill="none" stroke="var(--tb-icon)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              {%- when 'phone' -%}
+                <svg width="{{ section.settings.icon_size }}" height="{{ section.settings.icon_size }}" viewBox="0 0 24 24" fill="none" stroke="var(--tb-icon)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.16 6.16l1.27-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              {%- else -%}
+                <svg width="{{ section.settings.icon_size }}" height="{{ section.settings.icon_size }}" viewBox="0 0 24 24" fill="none" stroke="var(--tb-icon)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            {%- endcase -%}
+          </div>
+
+          <div class="tb-text">
+            <span class="tb-label">{{ lbl }}</span>
+            {%- if dsc != blank -%}
+              <span class="tb-desc">{{ dsc }}</span>
+            {%- endif -%}
+          </div>
+
+        {%- if url_val != blank -%}
+          </a>
+        {%- else -%}
+          </div>
+        {%- endif -%}
+
+        {%- comment -%} Divider between items (not after last) {%- endcomment -%}
+        {%- unless forloop.last -%}
+          {%- assign next_i = i | plus: 1 -%}
+          {%- assign next_label_key = 'label' | append: next_i -%}
+          {%- if section.settings[next_label_key] != blank and section.settings.show_dividers -%}
+            <div class="tb-divider" aria-hidden="true"></div>
+          {%- endif -%}
+        {%- endunless -%}
+
+      {%- endif -%}
+    {%- endfor -%}
+
+  </div>
+</div>
+
+
+<style>
+/* Root */
+#tb-{{ section.id }} {
+  --tb-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  position: relative;
+  background: var(--tb-bg, #ffffff);
+
+  border-top: 1px solid var(--tb-border, rgba(0,0,0,0.07));
+  border-bottom: 1px solid var(--tb-border, rgba(0,0,0,0.07));
+
+  border-radius: var(--tb-radius, 0px);
+
+  padding:
+    clamp(18px, 3vw, var(--tb-pad-v, 28px))
+    clamp(16px, 4vw, var(--tb-pad-h, 48px));
+
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Grain */
+#tb-{{ section.id }} .tb-grain {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  mix-blend-mode: overlay;
+}
+
+/* Inner */
+#tb-{{ section.id }} .tb-inner {
+  position: relative;
+  z-index: 1;
+
+  display: flex;
+  flex-wrap: wrap;
+
+  align-items: stretch;
+  justify-content: center;
+
+  gap: clamp(10px, 2vw, 20px);
+
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Item */
+#tb-{{ section.id }} .tb-item {
+  display: flex;
+  align-items: center;
+
+  gap: 14px;
+
+  flex: 1 1 220px;
+
+  min-width: 220px;
+  max-width: 100%;
+
+  padding: clamp(12px, 2vw, 18px);
+
+  border-radius: var(--tb-item-radius, 10px);
+
+  text-decoration: none;
+  color: inherit;
+
+  transition:
+    background 0.25s ease,
+    transform 0.25s var(--tb-ease),
+    box-shadow 0.25s ease;
+}
+
+/* Hover */
+#tb-{{ section.id }} .tb-item--link:hover {
+  background: rgba(0,0,0,0.03);
+  transform: translateY(-2px);
+}
+
+/* Icon Wrap */
+#tb-{{ section.id }} .tb-icon-wrap {
+  width: clamp(40px, 5vw, var(--tb-icon-bg-size, 48px));
+  height: clamp(40px, 5vw, var(--tb-icon-bg-size, 48px));
+
+  background: var(--tb-icon-bg, transparent);
+
+  border-radius: 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  transition: transform 0.3s var(--tb-ease);
+}
+
+#tb-{{ section.id }} .tb-item:hover .tb-icon-wrap {
+  transform: scale(1.08);
+}
+
+#tb-{{ section.id }} .tb-icon-wrap svg {
+  width: clamp(18px, 2vw, var(--tb-icon-size, 24px));
+  height: clamp(18px, 2vw, var(--tb-icon-size, 24px));
+
+  display: block;
+}
+
+/* Text */
+#tb-{{ section.id }} .tb-text {
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+
+  min-width: 0;
+  flex: 1;
+}
+
+/* Label */
+#tb-{{ section.id }} .tb-label {
+  font-size: clamp(12px, 1.4vw, var(--tb-label-size, 13px));
+
+  font-weight: 700;
+  line-height: 1.3;
+
+  letter-spacing: 0.03em;
+
+  color: var(--tb-label, #1C3557);
+
+  white-space: normal;
+  word-break: break-word;
+}
+
+/* Description */
+#tb-{{ section.id }} .tb-desc {
+  font-size: clamp(10px, 1.1vw, var(--tb-desc-size, 11px));
+
+  line-height: 1.5;
+
+  color: var(--tb-desc, rgba(0,0,0,0.55));
+
+  white-space: normal;
+  word-break: break-word;
+}
+
+/* Divider */
+#tb-{{ section.id }} .tb-divider {
+  width: 1px;
+  background: var(--tb-border, rgba(0,0,0,0.1));
+
+  align-self: stretch;
+
+  min-height: 42px;
+}
+
+/* Entrance Animation */
+#tb-{{ section.id }} .tb-anim {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+#tb-{{ section.id }} .tb-anim.tb-visible {
+  opacity: 1;
+  transform: translateY(0);
+
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s var(--tb-ease);
+}
+
+{% for i in (1..6) %}
+#tb-{{ section.id }} .tb-anim-{{ i }}.tb-visible {
+  transition-delay: {{ i | minus: 1 | times: 0.08 }}s;
+}
+{% endfor %}
+
+/* ─────────────────────────────
+   LARGE TABLET
+───────────────────────────── */
+@media screen and (max-width: 1024px) {
+
+  #tb-{{ section.id }} .tb-item {
+    flex: 1 1 calc(50% - 16px);
+    min-width: 260px;
+  }
+
+  #tb-{{ section.id }} .tb-divider {
+    display: none;
+  }
+}
+
+/* ─────────────────────────────
+   TABLET
+───────────────────────────── */
+@media screen and (max-width: 768px) {
+
+  #tb-{{ section.id }} {
+    padding: 20px 16px;
+  }
+
+  #tb-{{ section.id }} .tb-inner {
+    gap: 12px;
+  }
+
+  #tb-{{ section.id }} .tb-item {
+    flex: 1 1 calc(50% - 12px);
+
+    min-width: unset;
+
+    padding: 14px;
+  }
+
+  #tb-{{ section.id }} .tb-desc {
+    display: block;
+  }
+}
+
+/* ─────────────────────────────
+   MOBILE
+───────────────────────────── */
+@media screen and (max-width: 540px) {
+
+  #tb-{{ section.id }} .tb-inner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  #tb-{{ section.id }} .tb-item {
+    width: 100%;
+    flex: 1 1 100%;
+
+    padding: 14px 12px;
+
+    gap: 12px;
+  }
+
+  #tb-{{ section.id }} .tb-icon-wrap {
+    border-radius: 10px;
+  }
+
+  #tb-{{ section.id }} .tb-divider {
+    display: none;
+  }
+
+  #tb-{{ section.id }} .tb-label {
+    font-size: 13px;
+  }
+
+  #tb-{{ section.id }} .tb-desc {
+    font-size: 11px;
+  }
+}
+
+/* ─────────────────────────────
+   SMALL MOBILE
+───────────────────────────── */
+@media screen and (max-width: 380px) {
+
+  #tb-{{ section.id }} {
+    padding: 16px 12px;
+  }
+
+  #tb-{{ section.id }} .tb-item {
+    padding: 12px 10px;
+    gap: 10px;
+  }
+
+  #tb-{{ section.id }} .tb-label {
+    font-size: 12px;
+  }
+
+  #tb-{{ section.id }} .tb-desc {
+    font-size: 10px;
+  }
+
+  #tb-{{ section.id }} .tb-icon-wrap {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+
+  #tb-{{ section.id }} .tb-anim {
+    opacity: 1;
+    transform: none;
+    transition: none !important;
+  }
+
+  #tb-{{ section.id }} .tb-item,
+  #tb-{{ section.id }} .tb-icon-wrap {
+    transition: none !important;
+  }
+} 
+
+</style>
+
+
+<script>
+(function () {
+  var root = document.getElementById('tb-{{ section.id }}');
+  if (!root) return;
+
+  var items = Array.from(root.querySelectorAll('.tb-anim'));
+  if (!items.length) return;
+
+  if ('IntersectionObserver' in window) {
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          e.target.classList.add('tb-visible');
+          obs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.15 });
+
+    items.forEach(function (el) { obs.observe(el); });
+  } else {
+    items.forEach(function (el) { el.classList.add('tb-visible'); });
+  }
+})();
+</script>
+
+
+{% schema %}
+{
+  "name": "Trust Bar",
+  "settings": [
+    {
+      "type": "header",
+      "content": "🎨 Colours"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background colour",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border / divider colour",
+      "default": "#e5e7eb"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent colour",
+      "default": "#e8c97a"
+    },
+    {
+      "type": "color",
+      "id": "icon_color",
+      "label": "Icon colour",
+      "default": "#1C3557"
+    },
+    {
+      "type": "color",
+      "id": "icon_bg_color",
+      "label": "Icon background colour",
+      "default": "rgba(28,53,87,0.06)"
+    },
+    {
+      "type": "color",
+      "id": "label_color",
+      "label": "Label colour",
+      "default": "#1C3557"
+    },
+    {
+      "type": "color",
+      "id": "desc_color",
+      "label": "Description colour",
+      "default": "#6b7280"
+    },
+
+    {
+      "type": "header",
+      "content": "📐 Layout & Sizing"
+    },
+    {
+      "type": "range",
+      "id": "padding_vertical",
+      "label": "Vertical padding (px)",
+      "min": 8,
+      "max": 80,
+      "step": 4,
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "padding_horizontal",
+      "label": "Horizontal padding (px)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "item_gap",
+      "label": "Gap between items (px)",
+      "min": 0,
+      "max": 48,
+      "step": 4,
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "section_radius",
+      "label": "Section corner radius (px)",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "item_radius",
+      "label": "Item corner radius (px)",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "default": 8
+    },
+
+    {
+      "type": "header",
+      "content": "🔤 Typography"
+    },
+    {
+      "type": "range",
+      "id": "label_size",
+      "label": "Label font size (px)",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "desc_size",
+      "label": "Description font size (px)",
+      "min": 9,
+      "max": 16,
+      "step": 1,
+      "default": 11
+    },
+
+    {
+      "type": "header",
+      "content": "🔘 Icons"
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "label": "Icon size (px)",
+      "min": 16,
+      "max": 48,
+      "step": 2,
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "icon_bg_size",
+      "label": "Icon background circle size (px)",
+      "min": 32,
+      "max": 72,
+      "step": 4,
+      "default": 48
+    },
+
+    {
+      "type": "header",
+      "content": "✨ Visual Effects"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dividers",
+      "label": "Show dividers between items",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_shadow",
+      "label": "Show shadow",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_grain",
+      "label": "Show grain texture overlay",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "grain_opacity",
+      "label": "Grain opacity (%)",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 4
+    },
+
+    {
+      "type": "header",
+      "content": "📦 Item 1"
+    },
+    {
+      "type": "select",
+      "id": "icon1",
+      "label": "Icon",
+      "options": [
+        { "value": "shield",      "label": "Shield" },
+        { "value": "check-circle","label": "Check circle" },
+        { "value": "grid",        "label": "Grid / compatibility" },
+        { "value": "star",        "label": "Star" },
+        { "value": "truck",       "label": "Truck / delivery" },
+        { "value": "refresh",     "label": "Refresh / returns" },
+        { "value": "lock",        "label": "Lock / secure" },
+        { "value": "leaf",        "label": "Leaf / eco" },
+        { "value": "award",       "label": "Award / certified" },
+        { "value": "zap",         "label": "Zap / performance" },
+        { "value": "heart",       "label": "Heart" },
+        { "value": "phone",       "label": "Phone / support" }
+      ],
+      "default": "shield"
+    },
+    {
+      "type": "text",
+      "id": "label1",
+      "label": "Label",
+      "default": "Built to Last"
+    },
+    {
+      "type": "text",
+      "id": "desc1",
+      "label": "Description",
+      "default": "Up to 5-year warranty"
+    },
+    {
+      "type": "url",
+      "id": "url1",
+      "label": "Link URL (optional)"
+    },
+
+    {
+      "type": "header",
+      "content": "📦 Item 2"
+    },
+    {
+      "type": "select",
+      "id": "icon2",
+      "label": "Icon",
+      "options": [
+        { "value": "shield",      "label": "Shield" },
+        { "value": "check-circle","label": "Check circle" },
+        { "value": "grid",        "label": "Grid / compatibility" },
+        { "value": "star",        "label": "Star" },
+        { "value": "truck",       "label": "Truck / delivery" },
+        { "value": "refresh",     "label": "Refresh / returns" },
+        { "value": "lock",        "label": "Lock / secure" },
+        { "value": "leaf",        "label": "Leaf / eco" },
+        { "value": "award",       "label": "Award / certified" },
+        { "value": "zap",         "label": "Zap / performance" },
+        { "value": "heart",       "label": "Heart" },
+        { "value": "phone",       "label": "Phone / support" }
+      ],
+      "default": "check-circle"
+    },
+    {
+      "type": "text",
+      "id": "label2",
+      "label": "Label",
+      "default": "100% Food Safe"
+    },
+    {
+      "type": "text",
+      "id": "desc2",
+      "label": "Description",
+      "default": "PFOA free & food grade"
+    },
+    {
+      "type": "url",
+      "id": "url2",
+      "label": "Link URL (optional)"
+    },
+
+    {
+      "type": "header",
+      "content": "📦 Item 3"
+    },
+    {
+      "type": "select",
+      "id": "icon3",
+      "label": "Icon",
+      "options": [
+        { "value": "shield",      "label": "Shield" },
+        { "value": "check-circle","label": "Check circle" },
+        { "value": "grid",        "label": "Grid / compatibility" },
+        { "value": "star",        "label": "Star" },
+        { "value": "truck",       "label": "Truck / delivery" },
+        { "value": "refresh",     "label": "Refresh / returns" },
+        { "value": "lock",        "label": "Lock / secure" },
+        { "value": "leaf",        "label": "Leaf / eco" },
+        { "value": "award",       "label": "Award / certified" },
+        { "value": "zap",         "label": "Zap / performance" },
+        { "value": "heart",       "label": "Heart" },
+        { "value": "phone",       "label": "Phone / support" }
+      ],
+      "default": "grid"
+    },
+    {
+      "type": "text",
+      "id": "label3",
+      "label": "Label",
+      "default": "Universal Compatibility"
+    },
+    {
+      "type": "text",
+      "id": "desc3",
+      "label": "Description",
+      "default": "Gas, induction, electric & more"
+    },
+    {
+      "type": "url",
+      "id": "url3",
+      "label": "Link URL (optional)"
+    },
+
+    {
+      "type": "header",
+      "content": "📦 Item 4"
+    },
+    {
+      "type": "select",
+      "id": "icon4",
+      "label": "Icon",
+      "options": [
+        { "value": "shield",      "label": "Shield" },
+        { "value": "check-circle","label": "Check circle" },
+        { "value": "grid",        "label": "Grid / compatibility" },
+        { "value": "star",        "label": "Star" },
+        { "value": "truck",       "label": "Truck / delivery" },
+        { "value": "refresh",     "label": "Refresh / returns" },
+        { "value": "lock",        "label": "Lock / secure" },
+        { "value": "leaf",        "label": "Leaf / eco" },
+        { "value": "award",       "label": "Award / certified" },
+        { "value": "zap",         "label": "Zap / performance" },
+        { "value": "heart",       "label": "Heart" },
+        { "value": "phone",       "label": "Phone / support" }
+      ],
+      "default": "award"
+    },
+    {
+      "type": "text",
+      "id": "label4",
+      "label": "Label",
+      "default": "ISI Certified"
+    },
+    {
+      "type": "text",
+      "id": "desc4",
+      "label": "Description",
+      "default": "Meets Indian safety standards"
+    },
+    {
+      "type": "url",
+      "id": "url4",
+      "label": "Link URL (optional)"
+    },
+
+    {
+      "type": "header",
+      "content": "📦 Item 5 (optional)"
+    },
+    {
+      "type": "select",
+      "id": "icon5",
+      "label": "Icon",
+      "options": [
+        { "value": "shield",      "label": "Shield" },
+        { "value": "check-circle","label": "Check circle" },
+        { "value": "grid",        "label": "Grid / compatibility" },
+        { "value": "star",        "label": "Star" },
+        { "value": "truck",       "label": "Truck / delivery" },
+        { "value": "refresh",     "label": "Refresh / returns" },
+        { "value": "lock",        "label": "Lock / secure" },
+        { "value": "leaf",        "label": "Leaf / eco" },
+        { "value": "award",       "label": "Award / certified" },
+        { "value": "zap",         "label": "Zap / performance" },
+        { "value": "heart",       "label": "Heart" },
+        { "value": "phone",       "label": "Phone / support" }
+      ],
+      "default": "truck"
+    },
+    {
+      "type": "text",
+      "id": "label5",
+      "label": "Label"
+    },
+    {
+      "type": "text",
+      "id": "desc5",
+      "label": "Description"
+    },
+    {
+      "type": "url",
+      "id": "url5",
+      "label": "Link URL (optional)"
+    },
+
+    {
+      "type": "header",
+      "content": "📦 Item 6 (optional)"
+    },
+    {
+      "type": "select",
+      "id": "icon6",
+      "label": "Icon",
+      "options": [
+        { "value": "shield",      "label": "Shield" },
+        { "value": "check-circle","label": "Check circle" },
+        { "value": "grid",        "label": "Grid / compatibility" },
+        { "value": "star",        "label": "Star" },
+        { "value": "truck",       "label": "Truck / delivery" },
+        { "value": "refresh",     "label": "Refresh / returns" },
+        { "value": "lock",        "label": "Lock / secure" },
+        { "value": "leaf",        "label": "Leaf / eco" },
+        { "value": "award",       "label": "Award / certified" },
+        { "value": "zap",         "label": "Zap / performance" },
+        { "value": "heart",       "label": "Heart" },
+        { "value": "phone",       "label": "Phone / support" }
+      ],
+      "default": "phone"
+    },
+    {
+      "type": "text",
+      "id": "label6",
+      "label": "Label"
+    },
+    {
+      "type": "text",
+      "id": "desc6",
+      "label": "Description"
+    },
+    {
+      "type": "url",
+      "id": "url6",
+      "label": "Link URL (optional)"
+    }
+  ],
+  "presets": [{ "name": "Trust Bar" }]
+}
+{% endschema %}

@@ -1,0 +1,246 @@
+{%- if section.settings.show_announce -%}
+<div class="announce" style="background:{{ section.settings.announce_bg }};animation-duration:{{ section.settings.announce_speed }}s;">
+  <span class="announce-inner" style="color:{{ section.settings.announce_color }};font-size:{{ section.settings.announce_size }}px;">
+    {{ section.settings.announce_text }}&nbsp;&nbsp;·&nbsp;&nbsp;{{ section.settings.announce_text }}
+  </span>
+</div>
+{%- endif -%}
+
+<header>
+  <div class="header-inner">
+
+    <a href="{{ routes.root_url }}" class="logo">
+      {%- if section.settings.logo_image != blank -%}
+        <img src="{{ section.settings.logo_image | image_url: width: 300 }}" alt="{{ shop.name }}" style="height:{{ section.settings.logo_height }}px;width:auto;">
+      {%- else -%}
+        {{ section.settings.logo_text1 }}<em>{{ section.settings.logo_text2 }}</em>
+      {%- endif -%}
+    </a>
+
+    <nav class="header-nav" aria-label="Main navigation">
+      {%- for link in linklists[section.settings.menu].links -%}
+        <a href="{{ link.url }}"{% if link.url == request.path %} aria-current="page"{% endif %}>{{ link.title }}</a>
+      {%- endfor -%}
+    </nav>
+
+    <div class="header-icons">
+      {%- if section.settings.show_search -%}
+        <a href="{{ routes.search_url }}" aria-label="Search">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </a>
+      {%- endif -%}
+      {%- if section.settings.show_account -%}
+        <a href="{{ routes.account_url }}" aria-label="Account">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </a>
+      {%- endif -%}
+      <a href="{{ routes.cart_url }}" aria-label="Cart">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span class="cart-count">{{ cart.item_count }}</span>
+      </a>
+
+      {%- comment -%} Mobile hamburger button {%- endcomment -%}
+      <button
+        id="mobile-menu-btn"
+        class="mobile-menu-btn"
+        aria-label="Open menu"
+        aria-expanded="false"
+        aria-controls="mobile-nav"
+      >
+        <svg class="ham-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <line x1="3" y1="6"  x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+  </div>
+</header>
+
+{%- comment -%} Mobile nav drawer {%- endcomment -%}
+<div id="mobile-nav-overlay" class="mobile-nav-overlay" aria-hidden="true"></div>
+<nav
+  id="mobile-nav"
+  class="mobile-nav"
+  aria-label="Mobile navigation"
+  aria-hidden="true"
+>
+  <div class="mobile-nav-header">
+    <a href="{{ routes.root_url }}" class="mobile-nav-logo">
+      {%- if section.settings.logo_image != blank -%}
+        <img src="{{ section.settings.logo_image | image_url: width: 200 }}" alt="{{ shop.name }}" style="height:32px;width:auto;">
+      {%- else -%}
+        {{ section.settings.logo_text1 }}<em>{{ section.settings.logo_text2 }}</em>
+      {%- endif -%}
+    </a>
+    <button id="mobile-nav-close" class="mobile-nav-close" onclick="document.getElementById('mobile-menu-btn').click()" aria-label="Close menu">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+
+  <ul class="mobile-nav-links" role="list">
+    {%- for link in linklists[section.settings.menu].links -%}
+      <li>
+        <a href="{{ link.url }}"{% if link.url == request.path %} aria-current="page"{% endif %}>
+          {{ link.title }}
+        </a>
+      </li>
+    {%- endfor -%}
+  </ul>
+
+  <div class="mobile-nav-footer">
+    {%- if section.settings.show_search -%}
+      <a href="{{ routes.search_url }}" class="mobile-nav-icon-link">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        Search
+      </a>
+    {%- endif -%}
+    {%- if section.settings.show_account -%}
+      <a href="{{ routes.account_url }}" class="mobile-nav-icon-link">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Account
+      </a>
+    {%- endif -%}
+  </div>
+</nav>
+
+<style>
+/* ── Mobile hamburger — hidden on desktop ── */
+.mobile-menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: inherit;
+  line-height: 0;
+}
+
+/* ── Mobile nav overlay ── */
+.mobile-nav-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  z-index: 199;
+  transition: opacity .3s ease;
+}
+.mobile-nav-overlay[aria-hidden="false"] { display: block; }
+
+/* ── Mobile nav drawer ── */
+.mobile-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: min(320px, 85vw);
+  background: var(--warm-white, #FDFAF6);
+  z-index: 200;
+  transform: translateX(-100%);
+  transition: transform .35s cubic-bezier(.4,0,.2,1);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 4px 0 32px rgba(0,0,0,.12);
+}
+.mobile-nav.mobile-nav--open { transform: translateX(0); }
+
+.mobile-nav-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--light-gray, #D3D1C7);
+}
+.mobile-nav-logo {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--navy, #1C3557);
+  text-decoration: none;
+}
+.mobile-nav-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: var(--charcoal, #2C2C2A);
+  line-height: 0;
+}
+
+.mobile-nav-links {
+  list-style: none;
+  margin: 0;
+  padding: 12px 0;
+  flex: 1;
+  overflow-y: auto;
+}
+.mobile-nav-links li a {
+  display: block;
+  padding: 14px 24px;
+  font-family: var(--font-body);
+  font-size: .95rem;
+  letter-spacing: .04em;
+  color: var(--charcoal, #2C2C2A);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(0,0,0,.05);
+  transition: background .2s, color .2s;
+}
+.mobile-nav-links li a:hover,
+.mobile-nav-links li a[aria-current="page"] {
+  background: var(--cream, #F5F0E8);
+  color: var(--navy, #1C3557);
+}
+
+.mobile-nav-footer {
+  display: flex;
+  gap: 8px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--light-gray, #D3D1C7);
+}
+.mobile-nav-icon-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  font-size: .8rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--charcoal, #2C2C2A);
+  text-decoration: none;
+  border: 1px solid var(--light-gray, #D3D1C7);
+  border-radius: 4px;
+  transition: background .2s;
+}
+.mobile-nav-icon-link:hover { background: var(--cream, #F5F0E8); }
+
+@media (max-width: 860px) {
+  .header-nav { display: none; }
+  .mobile-menu-btn { display: flex; align-items: center; }
+}
+</style>
+
+{% schema %}
+{
+  "name": "Header",
+  "settings": [
+    { "type": "header", "content": "Announcement Bar" },
+    { "type": "checkbox", "id": "show_announce", "label": "Show announcement bar", "default": true },
+    { "type": "textarea", "id": "announce_text", "label": "Announcement text", "default": "Free shipping on orders above ₹999 · ISI Certified · PFOA Free · Up to 5 Year Warranty on Cookware · Universal Cooktop Compatibility" },
+    { "type": "color", "id": "announce_bg", "label": "Background color", "default": "#1C3557" },
+    { "type": "color", "id": "announce_color", "label": "Text color", "default": "#ffffff" },
+    { "type": "range", "id": "announce_size", "label": "Font size (px)", "min": 10, "max": 16, "step": 1, "default": 12 },
+    { "type": "range", "id": "announce_speed", "label": "Ticker speed (seconds)", "min": 10, "max": 60, "step": 2, "default": 22 },
+    { "type": "header", "content": "Logo" },
+    { "type": "image_picker", "id": "logo_image", "label": "Logo image (leave blank for text)" },
+    { "type": "range", "id": "logo_height", "label": "Logo image height (px)", "min": 20, "max": 80, "step": 2, "default": 40 },
+    { "type": "text", "id": "logo_text1", "label": "Logo text — part 1", "default": "Relic" },
+    { "type": "text", "id": "logo_text2", "label": "Logo text — italic part", "default": "a" },
+    { "type": "header", "content": "Navigation" },
+    { "type": "link_list", "id": "menu", "label": "Navigation menu", "default": "main-menu" },
+    { "type": "header", "content": "Icons" },
+    { "type": "checkbox", "id": "show_search", "label": "Show search icon", "default": true },
+    { "type": "checkbox", "id": "show_account", "label": "Show account icon", "default": true }
+  ]
+}
+{% endschema %}

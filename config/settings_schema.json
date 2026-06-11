@@ -1,0 +1,275 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "Relica",
+    "theme_version": "2.0.0",
+    "theme_author": "Relica Innovations",
+    "theme_documentation_url": "https://relicainnovations.com",
+    "theme_support_url": "https://relicainnovations.com/pages/contact"
+  },
+  {
+    "name": "Colors",
+    "settings": [
+      { "type": "header", "content": "Brand Colors" },
+      { "type": "color", "id": "color_primary", "label": "Primary color (Navy)", "default": "#1C3557" },
+      { "type": "color", "id": "color_accent", "label": "Accent color (Rose)", "default": "#C4827A" },
+      { "type": "color", "id": "color_secondary", "label": "Secondary color (Sage)", "default": "#6B7C5E" },
+      { "type": "header", "content": "Background Colors" },
+      { "type": "color", "id": "color_bg_main", "label": "Main background", "default": "#FDFAF6" },
+      { "type": "color", "id": "color_bg_cream", "label": "Cream background", "default": "#F5F0E8" },
+      { "type": "color", "id": "color_bg_off_white", "label": "Off-white background", "default": "#F9F7F4" },
+      { "type": "header", "content": "Text Colors" },
+      { "type": "color", "id": "color_text_body", "label": "Body text", "default": "#2C2C2A" },
+      { "type": "color", "id": "color_text_muted", "label": "Muted text", "default": "#888780" },
+      { "type": "header", "content": "Button Colors" },
+      { "type": "color", "id": "color_btn_primary_bg", "label": "Primary button background", "default": "#1C3557" },
+      { "type": "color", "id": "color_btn_primary_text", "label": "Primary button text", "default": "#FFFFFF" },
+      { "type": "color", "id": "color_atc_bg", "label": "Add to Cart background", "default": "#1C3557" },
+      { "type": "color", "id": "color_atc_text", "label": "Add to Cart text", "default": "#FFFFFF" },
+      { "type": "color", "id": "color_atc_hover", "label": "Add to Cart hover", "default": "#0F1F33" }
+    ]
+  },
+  {
+    "name": "Typography",
+    "settings": [
+      { "type": "header", "content": "Font Families" },
+      {
+        "type": "select",
+        "id": "font_display_family",
+        "label": "Display / Heading font",
+        "default": "Cormorant Garamond",
+        "options": [
+          { "value": "Cormorant Garamond", "label": "Cormorant Garamond (Default)" },
+          { "value": "Playfair Display", "label": "Playfair Display" },
+          { "value": "Libre Baskerville", "label": "Libre Baskerville" },
+          { "value": "Lora", "label": "Lora" },
+          { "value": "Merriweather", "label": "Merriweather" },
+          { "value": "Georgia", "label": "Georgia (System)" }
+        ]
+      },
+      {
+        "type": "select",
+        "id": "font_body_family",
+        "label": "Body / UI font",
+        "default": "DM Sans",
+        "options": [
+          { "value": "DM Sans", "label": "DM Sans (Default)" },
+          { "value": "Inter", "label": "Inter" },
+          { "value": "Manrope", "label": "Manrope" },
+          { "value": "Nunito Sans", "label": "Nunito Sans" },
+          { "value": "Open Sans", "label": "Open Sans" },
+          { "value": "Poppins", "label": "Poppins" },
+          { "value": "Raleway", "label": "Raleway" }
+        ]
+      },
+      { "type": "header", "content": "Sizes & Weight" },
+      { "type": "range", "id": "font_size_base", "label": "Base font size (px)", "min": 13, "max": 18, "step": 1, "default": 15 },
+      {
+        "type": "select",
+        "id": "font_weight_heading",
+        "label": "Heading weight",
+        "default": "300",
+        "options": [
+          { "value": "300", "label": "Light (300)" },
+          { "value": "400", "label": "Regular (400)" },
+          { "value": "600", "label": "Semi-bold (600)" }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Buttons & Forms",
+    "settings": [
+      { "type": "header", "content": "Button Style" },
+      {
+        "type": "select",
+        "id": "btn_style",
+        "label": "Button border radius",
+        "default": "sharp",
+        "options": [
+          { "value": "sharp", "label": "Sharp / Square (Default)" },
+          { "value": "slight", "label": "Slightly rounded (4px)" },
+          { "value": "rounded", "label": "Rounded (8px)" },
+          { "value": "pill", "label": "Pill" }
+        ]
+      },
+      {
+        "type": "select",
+        "id": "btn_size",
+        "label": "Button size",
+        "default": "medium",
+        "options": [
+          { "value": "small", "label": "Small" },
+          { "value": "medium", "label": "Medium (Default)" },
+          { "value": "large", "label": "Large" }
+        ]
+      },
+      { "type": "checkbox", "id": "btn_uppercase", "label": "Uppercase button text", "default": true },
+      { "type": "header", "content": "Form Fields" },
+      {
+        "type": "select",
+        "id": "input_style",
+        "label": "Input field style",
+        "default": "underline",
+        "options": [
+          { "value": "underline", "label": "Underline only" },
+          { "value": "outline", "label": "Full border outline" },
+          { "value": "filled", "label": "Filled background" }
+        ]
+      },
+      { "type": "color", "id": "color_input_border", "label": "Input border color", "default": "#D3D1C7" },
+      { "type": "color", "id": "color_input_focus", "label": "Input focus color", "default": "#1C3557" }
+    ]
+  },
+  {
+    "name": "Layout & Spacing",
+    "settings": [
+      {
+        "type": "select",
+        "id": "container_width",
+        "label": "Max content width",
+        "default": "1320px",
+        "options": [
+          { "value": "1100px", "label": "Narrow (1100px)" },
+          { "value": "1220px", "label": "Standard (1220px)" },
+          { "value": "1320px", "label": "Wide (1320px — Default)" },
+          { "value": "1440px", "label": "Extra wide (1440px)" }
+        ]
+      },
+      {
+        "type": "select",
+        "id": "section_spacing",
+        "label": "Section vertical spacing",
+        "default": "medium",
+        "options": [
+          { "value": "compact", "label": "Compact" },
+          { "value": "medium", "label": "Medium (Default)" },
+          { "value": "relaxed", "label": "Relaxed" },
+          { "value": "spacious", "label": "Spacious" }
+        ]
+      },
+      {
+        "type": "select",
+        "id": "card_style",
+        "label": "Product card style",
+        "default": "minimal",
+        "options": [
+          { "value": "minimal", "label": "Minimal (Default)" },
+          { "value": "bordered", "label": "Bordered" },
+          { "value": "shadow", "label": "Shadow" }
+        ]
+      },
+      { "type": "checkbox", "id": "card_image_zoom", "label": "Zoom image on hover", "default": true }
+    ]
+  },
+  {
+    "name": "Cart",
+    "settings": [
+      {
+        "type": "select",
+        "id": "cart_type",
+        "label": "Cart type",
+        "default": "drawer",
+        "options": [
+          { "value": "drawer", "label": "Slide-out drawer (Default)" },
+          { "value": "page", "label": "Dedicated cart page" }
+        ]
+      },
+      { "type": "checkbox", "id": "cart_show_note", "label": "Show order note field", "default": true },
+      { "type": "text", "id": "cart_free_shipping_threshold", "label": "Free shipping threshold (₹)", "default": "999" },
+      { "type": "checkbox", "id": "cart_show_recommendations", "label": "Show product recommendations in cart", "default": true },
+      { "type": "text", "id": "cart_recommendations_title", "label": "Recommendations heading", "default": "You may also like" }
+    ]
+  },
+  {
+    "name": "Product Pages",
+    "settings": [
+      {
+        "type": "select",
+        "id": "product_layout",
+        "label": "Product image layout",
+        "default": "gallery_left",
+        "options": [
+          { "value": "gallery_left", "label": "Gallery left, info right (Default)" },
+          { "value": "gallery_right", "label": "Gallery right, info left" },
+          { "value": "stacked", "label": "Stacked" }
+        ]
+      },
+      { "type": "checkbox", "id": "product_show_breadcrumb", "label": "Show breadcrumb", "default": true },
+      { "type": "checkbox", "id": "product_show_sku", "label": "Show SKU", "default": true },
+      { "type": "checkbox", "id": "product_show_quantity", "label": "Show quantity selector", "default": true },
+      { "type": "header", "content": "Trust Badges" },
+      { "type": "checkbox", "id": "product_show_trust", "label": "Show trust badges on product page", "default": true },
+      { "type": "text", "id": "product_trust_1", "label": "Trust badge 1", "default": "✓ Free shipping above ₹999" },
+      { "type": "text", "id": "product_trust_2", "label": "Trust badge 2", "default": "✓ ISI Certified & PFOA Free" },
+      { "type": "text", "id": "product_trust_3", "label": "Trust badge 3", "default": "✓ 30-day return policy" },
+      { "type": "text", "id": "product_trust_4", "label": "Trust badge 4", "default": "✓ Secure checkout" }
+    ]
+  },
+  {
+    "name": "Collection Pages",
+    "settings": [
+      {
+        "type": "select",
+        "id": "collection_products_per_row",
+        "label": "Products per row (desktop)",
+        "default": "3",
+        "options": [
+          { "value": "2", "label": "2 per row" },
+          { "value": "3", "label": "3 per row (Default)" },
+          { "value": "4", "label": "4 per row" }
+        ]
+      },
+      { "type": "checkbox", "id": "collection_show_filters", "label": "Show filter sidebar", "default": true },
+      { "type": "checkbox", "id": "collection_show_sort", "label": "Show sort dropdown", "default": true },
+      { "type": "checkbox", "id": "collection_show_quick_add", "label": "Show quick-add on hover", "default": true }
+    ]
+  },
+  {
+    "name": "Badges & Labels",
+    "settings": [
+      { "type": "color", "id": "badge_sale_bg", "label": "Sale badge background", "default": "#C4827A" },
+      { "type": "color", "id": "badge_sale_text", "label": "Sale badge text", "default": "#FFFFFF" },
+      { "type": "text", "id": "badge_sale_text_label", "label": "Sale badge text", "default": "Sale" },
+      { "type": "color", "id": "badge_new_bg", "label": "New badge background", "default": "#1C3557" },
+      { "type": "color", "id": "badge_new_text", "label": "New badge text", "default": "#FFFFFF" },
+      { "type": "text", "id": "badge_new_text_label", "label": "New badge text", "default": "New" }
+    ]
+  },
+  {
+    "name": "Social & Footer",
+    "settings": [
+      { "type": "checkbox", "id": "footer_show_social", "label": "Show social media icons", "default": true },
+      { "type": "text", "id": "footer_instagram", "label": "Instagram URL" },
+      { "type": "text", "id": "footer_facebook", "label": "Facebook URL" },
+      { "type": "text", "id": "footer_youtube", "label": "YouTube URL" },
+      { "type": "text", "id": "footer_twitter", "label": "Twitter / X URL" },
+      { "type": "checkbox", "id": "footer_show_payment", "label": "Show payment icons", "default": true },
+      { "type": "color", "id": "footer_bg", "label": "Footer background", "default": "#0F1F33" },
+      { "type": "color", "id": "footer_text", "label": "Footer text color", "default": "#FFFFFF" }
+    ]
+  },
+  {
+    "name": "Animations",
+    "settings": [
+      { "type": "checkbox", "id": "anim_enabled", "label": "Enable scroll animations", "default": true },
+      {
+        "type": "select",
+        "id": "anim_style",
+        "label": "Animation style",
+        "default": "fade_up",
+        "options": [
+          { "value": "fade_up", "label": "Fade up (Default)" },
+          { "value": "fade_in", "label": "Fade in" },
+          { "value": "none", "label": "No animation" }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Favicon",
+    "settings": [
+      { "type": "image_picker", "id": "favicon", "label": "Favicon", "info": "16×16px .ico or .png" }
+    ]
+  }
+]

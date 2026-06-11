@@ -1,0 +1,654 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+
+<style>
+  #CTABanner-{{ section.id }} {
+    --cta-bg:               {{ section.settings.section_bg }};
+    --cta-title:            {{ section.settings.title_color }};
+    --cta-italic:           {{ section.settings.italic_color }};
+    --cta-sub:              {{ section.settings.subtitle_color }};
+    --cta-btn1-bg:          {{ section.settings.btn1_bg }};
+    --cta-btn1-text:        {{ section.settings.btn1_text }};
+    --cta-btn1-hover-bg:    {{ section.settings.btn1_hover_bg }};
+    --cta-btn1-hover-text:  {{ section.settings.btn1_hover_text }};
+    --cta-btn2-border:      {{ section.settings.btn2_border }};
+    --cta-btn2-text:        {{ section.settings.btn2_text }};
+    --cta-btn2-hover-bg:    {{ section.settings.btn2_hover_bg }};
+    --cta-btn2-hover-text:  {{ section.settings.btn2_hover_text }};
+    --cta-pt:               {{ section.settings.padding_top }}px;
+    --cta-pb:               {{ section.settings.padding_bottom }}px;
+  }
+
+  .cta-section-{{ section.id }} {
+    background: var(--cta-bg);
+    padding: var(--cta-pt) {{ section.settings.side_padding }}px var(--cta-pb);
+    font-family: 'DM Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-align: {{ section.settings.text_align }};
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* optional decorative background pattern */
+  {%- if section.settings.show_bg_pattern -%}
+  .cta-section-{{ section.id }}::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle at 20% 50%, rgba(196,130,122,.06) 0%, transparent 50%),
+                      radial-gradient(circle at 80% 50%, rgba(28,53,87,.08) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  {%- endif -%}
+
+  .cta-inner-{{ section.id }} {
+    position: relative;
+    z-index: 1;
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+  }
+
+  /* ── EYEBROW ── */
+  .cta-eyebrow-{{ section.id }} {
+    display: block;
+    font-size: 11px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--cta-italic);
+    font-weight: 500;
+    margin: 0 0 16px;
+  }
+
+  /* ── TITLE ── */
+  .cta-title-{{ section.id }} {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp({{ section.settings.title_size_min }}px, 4vw, {{ section.settings.title_size_max }}px);
+    font-weight: 300;
+    color: var(--cta-title);
+    line-height: 1.1;
+    margin: 0 0 20px;
+  }
+
+  .cta-title-{{ section.id }} em {
+    font-style: italic;
+    color: var(--cta-italic);
+  }
+
+  /* ── SUBTITLE ── */
+  .cta-sub-{{ section.id }} {
+    font-size: 14px;
+    color: var(--cta-sub);
+    line-height: 1.85;
+    font-weight: 300;
+    margin: 0 auto {{ section.settings.btn_spacing }}px;
+    max-width: {{ section.settings.subtitle_max_width }}px;
+    {%- if section.settings.text_align == 'center' %}margin-left: auto; margin-right: auto;{%- endif %}
+  }
+
+  /* ── DIVIDER ── */
+  .cta-divider-{{ section.id }} {
+    display: none;
+    width: 40px;
+    height: 1px;
+    background: var(--cta-italic);
+    margin: 0 0 20px;
+    opacity: .4;
+    {%- if section.settings.text_align == 'center' %}margin-left: auto; margin-right: auto;{%- endif %}
+  }
+  {%- if section.settings.show_divider -%}
+  .cta-divider-{{ section.id }} { display: block; }
+  {%- endif -%}
+
+  /* ── BUTTONS ── */
+  .cta-btns-{{ section.id }} {
+    display: flex;
+    gap: {{ section.settings.btn_gap }}px;
+    flex-wrap: wrap;
+    {%- if section.settings.text_align == 'center' -%}
+    justify-content: center;
+    {%- elsif section.settings.text_align == 'right' -%}
+    justify-content: flex-end;
+    {%- else -%}
+    justify-content: flex-start;
+    {%- endif -%}
+  }
+
+  /* Button 1 — filled */
+  .cta-btn1-{{ section.id }} {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--cta-btn1-bg);
+    color: var(--cta-btn1-text);
+    padding: {{ section.settings.btn_padding_v }}px {{ section.settings.btn_padding_h }}px;
+    font-size: 12px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    border: 1px solid var(--cta-btn1-bg);
+    border-radius: {{ section.settings.btn_radius }}px;
+    transition: background .25s ease, color .25s ease, border-color .25s ease;
+  }
+
+  .cta-btn1-{{ section.id }} .btn-arrow {
+    display: inline-block;
+    transition: transform .25s ease;
+  }
+
+  .cta-btn1-{{ section.id }}:hover {
+    background: var(--cta-btn1-hover-bg);
+    color: var(--cta-btn1-hover-text);
+    border-color: var(--cta-btn1-hover-bg);
+  }
+
+  .cta-btn1-{{ section.id }}:hover .btn-arrow {
+    transform: translateX(4px);
+  }
+
+  /* Button 2 — outlined */
+  .cta-btn2-{{ section.id }} {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    color: var(--cta-btn2-text);
+    padding: {{ section.settings.btn_padding_v }}px {{ section.settings.btn_padding_h }}px;
+    font-size: 12px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    border: 1px solid var(--cta-btn2-border);
+    border-radius: {{ section.settings.btn_radius }}px;
+    transition: background .25s ease, color .25s ease, border-color .25s ease;
+  }
+
+  .cta-btn2-{{ section.id }} .btn-arrow {
+    display: inline-block;
+    transition: transform .25s ease;
+  }
+
+  .cta-btn2-{{ section.id }}:hover {
+    background: var(--cta-btn2-hover-bg);
+    color: var(--cta-btn2-hover-text);
+    border-color: var(--cta-btn2-hover-bg);
+  }
+
+  .cta-btn2-{{ section.id }}:hover .btn-arrow {
+    transform: translateX(4px);
+  }
+
+  /* ── REVEAL ── */
+  .cta-reveal-{{ section.id }} {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity .75s ease, transform .75s ease;
+  }
+
+  .cta-reveal-{{ section.id }}.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 749px) {
+    .cta-section-{{ section.id }} {
+      padding: {{ section.settings.padding_top | times: 0.7 | round }}px 24px {{ section.settings.padding_bottom | times: 0.7 | round }}px;
+      text-align: left;
+    }
+    .cta-btns-{{ section.id }} {
+      justify-content: flex-start;
+      flex-direction: {{ section.settings.btn_stack_mobile }};
+    }
+    .cta-btn1-{{ section.id }},
+    .cta-btn2-{{ section.id }} {
+      {%- if section.settings.btn_full_mobile -%}
+      width: 100%;
+      justify-content: center;
+      {%- endif -%}
+    }
+    .cta-sub-{{ section.id }} {
+      margin-left: 0;
+      margin-right: 0;
+    }
+    .cta-divider-{{ section.id }} {
+      margin-left: 0;
+      margin-right: 0;
+    }
+  }
+</style>
+
+<section
+  id="CTABanner-{{ section.id }}"
+  class="cta-section-{{ section.id }}"
+>
+  <div class="cta-inner-{{ section.id }} cta-reveal-{{ section.id }}">
+
+    {%- if section.settings.eyebrow != blank -%}
+      <span class="cta-eyebrow-{{ section.id }}">{{ section.settings.eyebrow }}</span>
+    {%- endif -%}
+
+    {%- if section.settings.show_divider -%}
+      <div class="cta-divider-{{ section.id }}"></div>
+    {%- endif -%}
+
+    {%- if section.settings.title_line1 != blank or section.settings.title_line2_plain != blank or section.settings.title_line2_italic != blank -%}
+      <h2 class="cta-title-{{ section.id }}">
+        {%- if section.settings.title_line1 != blank -%}
+          {{ section.settings.title_line1 }}
+          {%- if section.settings.title_line2_plain != blank or section.settings.title_line2_italic != blank -%}<br>{%- endif -%}
+        {%- endif -%}
+        {%- if section.settings.title_line2_plain != blank -%}
+          {{ section.settings.title_line2_plain }}
+        {%- endif -%}
+        {%- if section.settings.title_line2_italic != blank -%}
+          {%- if section.settings.title_line2_plain != blank %} {% endif -%}
+          <em>{{ section.settings.title_line2_italic }}</em>
+        {%- endif -%}
+      </h2>
+    {%- endif -%}
+
+    {%- if section.settings.subtitle != blank -%}
+      <p class="cta-sub-{{ section.id }}">{{ section.settings.subtitle }}</p>
+    {%- endif -%}
+
+    {%- if section.settings.btn1_label != blank or section.settings.btn2_label != blank -%}
+      <div class="cta-btns-{{ section.id }}">
+
+        {%- if section.settings.btn1_label != blank -%}
+          <a
+            href="{{ section.settings.btn1_url | default: '#' }}"
+            class="cta-btn1-{{ section.id }}"
+            {%- if section.settings.btn1_url contains 'http' %} target="_blank" rel="noopener"{% endif %}
+          >
+            {{ section.settings.btn1_label }}
+            {%- if section.settings.show_btn_arrows %}<span class="btn-arrow">→</span>{% endif -%}
+          </a>
+        {%- endif -%}
+
+        {%- if section.settings.btn2_label != blank -%}
+          <a
+            href="{{ section.settings.btn2_url | default: '#' }}"
+            class="cta-btn2-{{ section.id }}"
+            {%- if section.settings.btn2_url contains 'http' %} target="_blank" rel="noopener"{% endif %}
+          >
+            {{ section.settings.btn2_label }}
+            {%- if section.settings.show_btn_arrows %}<span class="btn-arrow">→</span>{% endif -%}
+          </a>
+        {%- endif -%}
+
+      </div>
+    {%- endif -%}
+
+  </div>
+</section>
+
+<script>
+  (function () {
+    var section = document.getElementById('CTABanner-{{ section.id }}');
+    if (!section) return;
+    var els = section.querySelectorAll('.cta-reveal-{{ section.id }}');
+    if ('IntersectionObserver' in window) {
+      var obs = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) {
+            e.target.classList.add('visible');
+            obs.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      els.forEach(function (el) { obs.observe(el); });
+    } else {
+      els.forEach(function (el) { el.classList.add('visible'); });
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "CTA Banner",
+  "tag": "section",
+  "class": "section-cta-banner",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow label",
+      "info": "Leave blank to hide."
+    },
+    {
+      "type": "text",
+      "id": "title_line1",
+      "label": "Title — line 1",
+      "default": "Ready to Elevate"
+    },
+    {
+      "type": "text",
+      "id": "title_line2_plain",
+      "label": "Title — line 2 plain",
+      "default": "Your"
+    },
+    {
+      "type": "text",
+      "id": "title_line2_italic",
+      "label": "Title — line 2 italic accent",
+      "default": "Kitchen?"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Explore the complete Relica range — from premium Die-Cast nonstick to Triply stainless steel, the revolutionary Honeycomb series, and the Vitajet Mixer."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_divider",
+      "label": "Show accent divider line",
+      "default": false
+    },
+
+    {
+      "type": "header",
+      "content": "Button 1 — Primary"
+    },
+    {
+      "type": "text",
+      "id": "btn1_label",
+      "label": "Button 1 label",
+      "default": "Shop All Products"
+    },
+    {
+      "type": "url",
+      "id": "btn1_url",
+      "label": "Button 1 URL"
+    },
+    {
+      "type": "header",
+      "content": "Button 2 — Outlined"
+    },
+    {
+      "type": "text",
+      "id": "btn2_label",
+      "label": "Button 2 label",
+      "default": "Download Catalogue"
+    },
+    {
+      "type": "url",
+      "id": "btn2_url",
+      "label": "Button 2 URL"
+    },
+    {
+      "type": "header",
+      "content": "Button Style"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_btn_arrows",
+      "label": "Show arrow on buttons",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "btn_full_mobile",
+      "label": "Full-width buttons on mobile",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "btn_stack_mobile",
+      "label": "Button direction on mobile",
+      "options": [
+        { "value": "row",    "label": "Side by side" },
+        { "value": "column", "label": "Stacked"      }
+      ],
+      "default": "row"
+    },
+    {
+      "type": "range",
+      "id": "btn_radius",
+      "label": "Button corner radius",
+      "min": 0,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "btn_padding_v",
+      "label": "Button vertical padding",
+      "min": 8,
+      "max": 28,
+      "step": 2,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "btn_padding_h",
+      "label": "Button horizontal padding",
+      "min": 16,
+      "max": 64,
+      "step": 4,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "btn_gap",
+      "label": "Gap between buttons",
+      "min": 4,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "btn_spacing",
+      "label": "Space above buttons",
+      "min": 12,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 36
+    },
+
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "section_bg",
+      "label": "Section background",
+      "default": "#F5F0E8"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title color",
+      "default": "#0F1F33"
+    },
+    {
+      "type": "color",
+      "id": "italic_color",
+      "label": "Italic accent & eyebrow color",
+      "default": "#C4827A"
+    },
+    {
+      "type": "color",
+      "id": "subtitle_color",
+      "label": "Subtitle color",
+      "default": "#888780"
+    },
+    {
+      "type": "color",
+      "id": "btn1_bg",
+      "label": "Button 1 background",
+      "default": "#1C3557"
+    },
+    {
+      "type": "color",
+      "id": "btn1_text",
+      "label": "Button 1 text",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "btn1_hover_bg",
+      "label": "Button 1 background — hover",
+      "default": "#0F1F33"
+    },
+    {
+      "type": "color",
+      "id": "btn1_hover_text",
+      "label": "Button 1 text — hover",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "btn2_border",
+      "label": "Button 2 border",
+      "default": "#2C2C2A"
+    },
+    {
+      "type": "color",
+      "id": "btn2_text",
+      "label": "Button 2 text",
+      "default": "#2C2C2A"
+    },
+    {
+      "type": "color",
+      "id": "btn2_hover_bg",
+      "label": "Button 2 background — hover",
+      "default": "#2C2C2A"
+    },
+    {
+      "type": "color",
+      "id": "btn2_hover_text",
+      "label": "Button 2 text — hover",
+      "default": "#FFFFFF"
+    },
+
+    {
+      "type": "header",
+      "content": "Typography & Layout"
+    },
+    {
+      "type": "range",
+      "id": "title_size_min",
+      "label": "Title min size (mobile)",
+      "min": 24,
+      "max": 52,
+      "step": 2,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "title_size_max",
+      "label": "Title max size (desktop)",
+      "min": 36,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 54
+    },
+    {
+      "type": "select",
+      "id": "text_align",
+      "label": "Text alignment",
+      "options": [
+        { "value": "left",   "label": "Left"   },
+        { "value": "center", "label": "Center" },
+        { "value": "right",  "label": "Right"  }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Max content width",
+      "min": 400,
+      "max": 1200,
+      "step": 20,
+      "unit": "px",
+      "default": 600
+    },
+    {
+      "type": "range",
+      "id": "subtitle_max_width",
+      "label": "Subtitle max width",
+      "min": 300,
+      "max": 900,
+      "step": 20,
+      "unit": "px",
+      "default": 560
+    },
+    {
+      "type": "checkbox",
+      "id": "show_bg_pattern",
+      "label": "Show subtle background radial glow",
+      "default": false
+    },
+
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "side_padding",
+      "label": "Side padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    }
+  ],
+
+  "presets": [
+    {
+      "name": "CTA Banner",
+      "settings": {
+        "title_line1": "Ready to Elevate",
+        "title_line2_plain": "Your",
+        "title_line2_italic": "Kitchen?",
+        "subtitle": "Explore the complete Relica range — from premium Die-Cast nonstick to Triply stainless steel, the revolutionary Honeycomb series, and the Vitajet Mixer.",
+        "btn1_label": "Shop All Products",
+        "btn2_label": "Download Catalogue"
+      }
+    }
+  ]
+}
+{% endschema %}

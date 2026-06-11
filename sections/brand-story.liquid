@@ -1,0 +1,753 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+
+<style>
+  #BrandStory-{{ section.id }} {
+    --bs-bg:             {{ section.settings.section_bg }};
+    --bs-eyebrow:        {{ section.settings.eyebrow_color }};
+    --bs-title:          {{ section.settings.title_color }};
+    --bs-body:           {{ section.settings.body_color }};
+    --bs-quote-border:   {{ section.settings.quote_border_color }};
+    --bs-quote-text:     {{ section.settings.quote_text_color }};
+    --bs-stat-num:       {{ section.settings.stat_num_color }};
+    --bs-stat-label:     {{ section.settings.stat_label_color }};
+    --bs-stat-border:    {{ section.settings.stat_border_color }};
+    --bs-btn-border:     {{ section.settings.btn_border_color }};
+    --bs-btn-text:       {{ section.settings.btn_text_color }};
+    --bs-btn-hover-bg:   {{ section.settings.btn_hover_bg }};
+    --bs-btn-hover-text: {{ section.settings.btn_hover_text }};
+    --bs-pt:             {{ section.settings.padding_top }}px;
+    --bs-pb:             {{ section.settings.padding_bottom }}px;
+    --bs-gap:            {{ section.settings.column_gap }}px;
+    --bs-radius:         {{ section.settings.image_radius }}px;
+  }
+
+  .bs-section-{{ section.id }} {
+    background: var(--bs-bg);
+    padding: var(--bs-pt) {{ section.settings.side_padding }}px var(--bs-pb);
+    font-family: 'DM Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .bs-grid-{{ section.id }} {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--bs-gap);
+    align-items: center;
+  }
+
+  /* ── LEFT COLUMN ── */
+  .bs-eyebrow-{{ section.id }} {
+    font-size: 11px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--bs-eyebrow);
+    font-weight: 500;
+    margin: 0 0 20px;
+  }
+
+  .bs-title-{{ section.id }} {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp({{ section.settings.title_size_min }}px, 4vw, {{ section.settings.title_size_max }}px);
+    font-weight: 300;
+    line-height: 1.1;
+    color: var(--bs-title);
+    margin: 0 0 28px;
+  }
+
+  .bs-title-{{ section.id }} em {
+    font-style: italic;
+    color: var(--bs-eyebrow);
+  }
+
+  .bs-body-{{ section.id }} {
+    font-size: 15px;
+    line-height: 1.9;
+    color: var(--bs-body);
+    font-weight: 300;
+    margin: 0 0 28px;
+    max-width: 520px;
+  }
+
+  .bs-quote-{{ section.id }} {
+    border-left: 2px solid var(--bs-quote-border);
+    padding-left: 24px;
+    margin: 0 0 28px;
+  }
+
+  .bs-quote-{{ section.id }} p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 19px;
+    font-style: italic;
+    color: var(--bs-quote-text);
+    line-height: 1.65;
+    font-weight: 300;
+    margin: 0;
+  }
+
+  .bs-btn-{{ section.id }} {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--bs-btn-border);
+    color: var(--bs-btn-text);
+    padding: 14px 32px;
+    font-size: 12px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    transition: background .25s ease, color .25s ease, border-color .25s ease;
+    margin-bottom: 44px;
+  }
+
+  .bs-btn-{{ section.id }} .btn-arrow {
+    display: inline-block;
+    transition: transform .25s ease;
+  }
+
+  .bs-btn-{{ section.id }}:hover {
+    background: var(--bs-btn-hover-bg);
+    color: var(--bs-btn-hover-text);
+    border-color: var(--bs-btn-hover-bg);
+  }
+
+  .bs-btn-{{ section.id }}:hover .btn-arrow {
+    transform: translateX(4px);
+  }
+
+  .bs-stats-{{ section.id }} {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.stat_columns }}, 1fr);
+    gap: 24px;
+    padding-top: 40px;
+    border-top: 1px solid var(--bs-stat-border);
+  }
+
+  .bs-stat-item-{{ section.id }} {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .bs-stat-num-{{ section.id }} {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(32px, 3.5vw, 42px);
+    font-weight: 300;
+    color: var(--bs-stat-num);
+    line-height: 1;
+    display: block;
+  }
+
+  .bs-stat-label-{{ section.id }} {
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--bs-stat-label);
+    margin-top: 8px;
+    display: block;
+    font-weight: 400;
+  }
+
+  /* ── RIGHT COLUMN — VISUAL ── */
+  .bs-visual-{{ section.id }} {
+    position: relative;
+  }
+
+  .bs-main-img-{{ section.id }} {
+    width: 100%;
+    aspect-ratio: {{ section.settings.main_image_ratio }};
+    border-radius: var(--bs-radius);
+    overflow: hidden;
+    display: flex;
+    align-items: flex-end;
+    padding: 32px;
+    position: relative;
+  }
+
+  .bs-main-img-{{ section.id }} img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .bs-main-img-placeholder-{{ section.id }} {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+    color: rgba(255,255,255,.2);
+    position: relative;
+    z-index: 1;
+    line-height: 1.5;
+  }
+
+  .bs-sub-img-{{ section.id }} {
+    position: absolute;
+    bottom: -30px;
+    left: -30px;
+    width: {{ section.settings.sub_image_size }}%;
+    aspect-ratio: 1;
+    border: {{ section.settings.sub_image_border }}px solid var(--bs-bg);
+    border-radius: var(--bs-radius);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .bs-sub-img-{{ section.id }} img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* ── REVEAL ANIMATIONS ── */
+  .reveal-left-bs-{{ section.id }},
+  .reveal-right-bs-{{ section.id }} {
+    opacity: 0;
+    transition: opacity .75s ease, transform .75s ease;
+  }
+
+  .reveal-left-bs-{{ section.id }}  { transform: translateX(-36px); }
+  .reveal-right-bs-{{ section.id }} { transform: translateX(36px); }
+
+  .reveal-left-bs-{{ section.id }}.visible,
+  .reveal-right-bs-{{ section.id }}.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 990px) {
+    .bs-grid-{{ section.id }} {
+      gap: calc(var(--bs-gap) * 0.65);
+    }
+    .bs-sub-img-{{ section.id }} {
+      left: -16px;
+      bottom: -16px;
+    }
+  }
+
+  @media (max-width: 749px) {
+    .bs-section-{{ section.id }} {
+      padding: {{ section.settings.padding_top | times: 0.65 | round }}px 24px {{ section.settings.padding_bottom | times: 0.65 | round }}px;
+    }
+    .bs-grid-{{ section.id }} {
+      grid-template-columns: 1fr;
+      gap: 56px;
+    }
+    .bs-visual-{{ section.id }} {
+      order: -1;
+    }
+    .bs-sub-img-{{ section.id }} {
+      left: -12px;
+      bottom: -12px;
+      width: 42%;
+      border-width: 4px;
+    }
+    .bs-body-{{ section.id }} {
+      max-width: 100%;
+    }
+    .bs-stats-{{ section.id }} {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .bs-btn-{{ section.id }} {
+      margin-bottom: 36px;
+    }
+  }
+</style>
+
+<section
+  id="BrandStory-{{ section.id }}"
+  class="bs-section-{{ section.id }}"
+>
+  <div class="bs-grid-{{ section.id }}">
+
+    <!-- ── LEFT: TEXT CONTENT ── -->
+    <div class="reveal-left-bs-{{ section.id }}">
+
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="bs-eyebrow-{{ section.id }}">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
+
+      {%- if section.settings.title_line1 != blank or section.settings.title_line2 != blank -%}
+        <h2 class="bs-title-{{ section.id }}">
+          {%- if section.settings.title_line1 != blank -%}
+            {{ section.settings.title_line1 }},
+            {%- if section.settings.title_line2 != blank %}<br>{% endif -%}
+          {%- endif -%}
+          {%- if section.settings.title_line2 != blank -%}
+            <em>{{ section.settings.title_line2 }}</em>
+          {%- endif -%}
+        </h2>
+      {%- endif -%}
+
+      {%- if section.settings.body_text != blank -%}
+        <p class="bs-body-{{ section.id }}">{{ section.settings.body_text }}</p>
+      {%- endif -%}
+
+      {%- if section.settings.quote != blank -%}
+        <div class="bs-quote-{{ section.id }}">
+          <p>&ldquo;{{ section.settings.quote }}&rdquo;</p>
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.btn_label != blank -%}
+        <a href="{{ section.settings.btn_url | default: '#' }}" class="bs-btn-{{ section.id }}">
+          {{ section.settings.btn_label }}
+          <span class="btn-arrow">→</span>
+        </a>
+      {%- endif -%}
+
+      {%- assign stat_blocks = section.blocks | where: 'type', 'stat' -%}
+      {%- if stat_blocks.size > 0 -%}
+        <div class="bs-stats-{{ section.id }}">
+          {%- for block in stat_blocks -%}
+            <div class="bs-stat-item-{{ section.id }}" {{ block.shopify_attributes }}>
+              <span class="bs-stat-num-{{ section.id }}">{{ block.settings.number }}</span>
+              <span class="bs-stat-label-{{ section.id }}">{{ block.settings.label }}</span>
+            </div>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+
+    </div>
+
+    <!-- ── RIGHT: VISUAL ── -->
+    <div class="bs-visual-{{ section.id }} reveal-right-bs-{{ section.id }}">
+
+      <div
+        class="bs-main-img-{{ section.id }}"
+        {%- if section.settings.main_image == blank -%}
+          style="background: {% if section.settings.main_image_gradient != blank %}{{ section.settings.main_image_gradient }}{% else %}{{ section.settings.main_image_color }}{% endif %};"
+        {%- endif -%}
+      >
+        {%- if section.settings.main_image != blank -%}
+          {{ section.settings.main_image | image_url: width: 1000 | image_tag:
+              loading: 'lazy',
+              widths: '400, 600, 800, 1000',
+              sizes: '(min-width: 750px) 50vw, 100vw',
+              alt: section.settings.title_line1
+          }}
+        {%- else -%}
+          <span class="bs-main-img-placeholder-{{ section.id }}">
+            {{ section.settings.main_image_label | default: 'Add an image in the theme editor' }}
+          </span>
+        {%- endif -%}
+      </div>
+
+      {%- if section.settings.show_sub_image -%}
+        <div
+          class="bs-sub-img-{{ section.id }}"
+          {%- if section.settings.sub_image == blank -%}
+            style="background: {% if section.settings.sub_image_gradient != blank %}{{ section.settings.sub_image_gradient }}{% else %}{{ section.settings.sub_image_color }}{% endif %};"
+          {%- endif -%}
+        >
+          {%- if section.settings.sub_image != blank -%}
+            {{ section.settings.sub_image | image_url: width: 500 | image_tag:
+                loading: 'lazy',
+                widths: '200, 320, 500',
+                sizes: '30vw',
+                alt: ''
+            }}
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+    </div>
+
+  </div>
+</section>
+
+<script>
+  (function () {
+    var section = document.getElementById('BrandStory-{{ section.id }}');
+    if (!section) return;
+    var els = section.querySelectorAll(
+      '.reveal-left-bs-{{ section.id }}, .reveal-right-bs-{{ section.id }}'
+    );
+    if ('IntersectionObserver' in window) {
+      var obs = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) {
+            e.target.classList.add('visible');
+            obs.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      els.forEach(function (el) { obs.observe(el); });
+    } else {
+      els.forEach(function (el) { el.classList.add('visible'); });
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Brand Story",
+  "tag": "section",
+  "class": "section-brand-story",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow label",
+      "default": "Our Heritage"
+    },
+    {
+      "type": "text",
+      "id": "title_line1",
+      "label": "Title — line 1 (plain)",
+      "default": "Born from Tradition"
+    },
+    {
+      "type": "text",
+      "id": "title_line2",
+      "label": "Title — line 2 (italic accent)",
+      "default": "Elevated by Technology"
+    },
+    {
+      "type": "textarea",
+      "id": "body_text",
+      "label": "Body paragraph",
+      "default": "Relica was born from a simple idea — to bring world-class cookware and appliances into Indian homes, crafted with the same integrity and precision that our family has upheld for generations."
+    },
+    {
+      "type": "textarea",
+      "id": "quote",
+      "label": "Pull quote",
+      "info": "Leave blank to hide the quote block.",
+      "default": "I saw a new India emerging — one that wanted global quality, refined design, and dependable performance, all made for the way we cook."
+    },
+
+    {
+      "type": "header",
+      "content": "Button"
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button label",
+      "default": "Read Our Full Story"
+    },
+    {
+      "type": "url",
+      "id": "btn_url",
+      "label": "Button URL"
+    },
+
+    {
+      "type": "header",
+      "content": "Images"
+    },
+    {
+      "type": "image_picker",
+      "id": "main_image",
+      "label": "Main image",
+      "info": "Recommended: 800 × 1000 px (4:5 ratio)"
+    },
+    {
+      "type": "select",
+      "id": "main_image_ratio",
+      "label": "Main image aspect ratio",
+      "options": [
+        { "value": "4/5",  "label": "4 : 5  (portrait)" },
+        { "value": "3/4",  "label": "3 : 4  (portrait)" },
+        { "value": "1/1",  "label": "1 : 1  (square)" },
+        { "value": "16/9", "label": "16 : 9 (wide)" }
+      ],
+      "default": "4/5"
+    },
+    {
+      "type": "color",
+      "id": "main_image_color",
+      "label": "Main image fallback color",
+      "default": "#24436B"
+    },
+    {
+      "type": "color_background",
+      "id": "main_image_gradient",
+      "label": "Main image fallback gradient",
+      "info": "Overrides solid color when set.",
+      "default": "linear-gradient(160deg, #24436B, #0F1F33)"
+    },
+    {
+      "type": "text",
+      "id": "main_image_label",
+      "label": "Main image placeholder text",
+      "default": "Family Kitchen Photography"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sub_image",
+      "label": "Show secondary (overlapping) image",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "sub_image",
+      "label": "Secondary image",
+      "info": "Square crop recommended. Appears as a floating accent."
+    },
+    {
+      "type": "color",
+      "id": "sub_image_color",
+      "label": "Secondary image fallback color",
+      "default": "#0F1F33"
+    },
+    {
+      "type": "color_background",
+      "id": "sub_image_gradient",
+      "label": "Secondary image fallback gradient",
+      "info": "Overrides solid color when set.",
+      "default": "linear-gradient(135deg, #0F1F33, #1C3557)"
+    },
+    {
+      "type": "range",
+      "id": "sub_image_size",
+      "label": "Secondary image size",
+      "min": 25,
+      "max": 65,
+      "step": 5,
+      "unit": "%",
+      "default": 55
+    },
+    {
+      "type": "range",
+      "id": "sub_image_border",
+      "label": "Secondary image border thickness",
+      "min": 0,
+      "max": 12,
+      "step": 1,
+      "unit": "px",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "image_radius",
+      "label": "Image corner radius",
+      "min": 0,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "section_bg",
+      "label": "Section background",
+      "default": "#1C3557"
+    },
+    {
+      "type": "color",
+      "id": "eyebrow_color",
+      "label": "Eyebrow & italic accent",
+      "default": "#D9A49E"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "body_color",
+      "label": "Body text color",
+      "default": "#99A8BB"
+    },
+    {
+      "type": "color",
+      "id": "quote_border_color",
+      "label": "Quote border color",
+      "default": "#C4827A"
+    },
+    {
+      "type": "color",
+      "id": "quote_text_color",
+      "label": "Quote text color",
+      "default": "#BFC8D2"
+    },
+    {
+      "type": "color",
+      "id": "stat_num_color",
+      "label": "Stat number color",
+      "default": "#D9A49E"
+    },
+    {
+      "type": "color",
+      "id": "stat_label_color",
+      "label": "Stat label color",
+      "default": "#627A93"
+    },
+    {
+      "type": "color",
+      "id": "stat_border_color",
+      "label": "Stats top border color",
+      "default": "#263F58"
+    },
+    {
+      "type": "color",
+      "id": "btn_border_color",
+      "label": "Button border color",
+      "default": "#4A6278"
+    },
+    {
+      "type": "color",
+      "id": "btn_text_color",
+      "label": "Button text color",
+      "default": "#BFC8D2"
+    },
+    {
+      "type": "color",
+      "id": "btn_hover_bg",
+      "label": "Button hover background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "btn_hover_text",
+      "label": "Button hover text",
+      "default": "#0F1F33"
+    },
+
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size_min",
+      "label": "Title min size (mobile)",
+      "min": 28,
+      "max": 52,
+      "step": 2,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "title_size_max",
+      "label": "Title max size (desktop)",
+      "min": 40,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 58
+    },
+
+    {
+      "type": "header",
+      "content": "Layout & Spacing"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Max content width",
+      "min": 1000,
+      "max": 1600,
+      "step": 20,
+      "unit": "px",
+      "default": 1320
+    },
+    {
+      "type": "range",
+      "id": "column_gap",
+      "label": "Column gap",
+      "min": 20,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "side_padding",
+      "label": "Side padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "stat_columns",
+      "label": "Stat columns",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 3
+    }
+  ],
+
+  "blocks": [
+    {
+      "type": "stat",
+      "name": "Statistic",
+      "limit": 5,
+      "settings": [
+        {
+          "type": "text",
+          "id": "number",
+          "label": "Number / value",
+          "default": "5+"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Series"
+        }
+      ]
+    }
+  ],
+
+  "presets": [
+    {
+      "name": "Brand Story",
+      "blocks": [
+        { "type": "stat", "settings": { "number": "5+",   "label": "Series"   } },
+        { "type": "stat", "settings": { "number": "100+", "label": "Products" } },
+        { "type": "stat", "settings": { "number": "5yr",  "label": "Warranty" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

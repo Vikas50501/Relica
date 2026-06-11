@@ -1,0 +1,46 @@
+<section class="about-values-section" style="background:{{ section.settings.bg_color }};">
+  <div class="section-inner">
+    {%- if section.settings.eyebrow != blank -%}
+      <p class="section-eyebrow">{{ section.settings.eyebrow }}</p>
+    {%- endif -%}
+    <h2 class="section-title">{{ section.settings.title }}</h2>
+    <div class="values-grid">
+      {%- for block in section.blocks -%}
+        <div class="value-card" {{ block.shopify_attributes }}>
+          {%- if block.settings.icon != blank -%}
+            <div class="value-icon">{{ block.settings.icon }}</div>
+          {%- endif -%}
+          {%- if block.settings.image != blank -%}
+            <img src="{{ block.settings.image | image_url: width: 80 }}" alt="{{ block.settings.title }}" class="value-img">
+          {%- endif -%}
+          <h3 class="value-title">{{ block.settings.title }}</h3>
+          <p class="value-body">{{ block.settings.body }}</p>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "About Values",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Our Values" },
+    { "type": "text", "id": "title", "label": "Heading", "default": "What We Stand For" },
+    { "type": "color", "id": "bg_color", "label": "Background color", "default": "#F5F0E8" }
+  ],
+  "blocks": [
+    {
+      "type": "value",
+      "name": "Value Card",
+      "settings": [
+        { "type": "text", "id": "icon", "label": "Emoji icon", "default": "🌱" },
+        { "type": "image_picker", "id": "image", "label": "Icon image (overrides emoji)" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Our Value" },
+        { "type": "textarea", "id": "body", "label": "Description" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "About Values" }]
+}
+{% endschema %}

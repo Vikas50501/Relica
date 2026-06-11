@@ -1,0 +1,26 @@
+{
+  "sections": {
+    "catalog-hero": {
+      "type": "catalog-hero",
+      "settings": {
+        "eyebrow": "Our Catalogue",
+        "title_plain": "Browse Our",
+        "title_italic": "Collections",
+        "subtitle": "Discover premium cookware crafted for every kitchen — from everyday essentials to professional-grade series."
+      }
+    },
+    "catalog-main": {
+      "type": "catalog-main",
+      "settings": {
+        "show_search": true,
+        "show_sort": true,
+        "layout": "grid",
+        "columns": "3",
+        "show_product_count": true,
+        "show_description": true,
+        "empty_text": "No collections found."
+      }
+    }
+  },
+  "order": ["catalog-hero", "catalog-main"]
+}

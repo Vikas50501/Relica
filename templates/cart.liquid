@@ -1,0 +1,90 @@
+{% layout 'theme' %}
+
+<div class="page-width" style="padding: var(--section-pad) 20px;">
+  <h1 style="font-family:var(--font-display);font-size:clamp(1.8rem,4vw,2.8rem);font-weight:300;margin-bottom:2rem;">Your Cart</h1>
+
+  {%- if cart.item_count == 0 -%}
+    <div style="text-align:center;padding:60px 20px;">
+      <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="var(--light-gray)" stroke-width="1"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      <h2 style="margin:20px 0 8px;font-weight:400;">Your cart is empty</h2>
+      <p style="color:var(--mid-gray);margin-bottom:24px;">Looks like you haven't added anything yet.</p>
+      <a href="/collections/all" class="btn-primary">Continue Shopping</a>
+    </div>
+  {%- else -%}
+    <div class="cart-page-layout">
+      <div class="cart-page-items">
+        {%- for item in cart.items -%}
+          <div class="cart-page-item">
+            {%- if item.image -%}
+              <a href="{{ item.url }}">
+                <img src="{{ item.image | image_url: width: 180 }}" alt="{{ item.title | escape }}" class="cart-page-img" width="90" height="90">
+              </a>
+            {%- endif -%}
+            <div class="cart-page-info">
+              <a href="{{ item.url }}" class="cart-page-title">{{ item.product.title }}</a>
+              {%- unless item.product.has_only_default_variant -%}
+                <p class="cart-page-variant">{{ item.variant.title }}</p>
+              {%- endunless -%}
+              {%- if item.selling_plan_allocation -%}
+                <p class="cart-page-variant">{{ item.selling_plan_allocation.selling_plan.name }}</p>
+              {%- endif -%}
+              {%- if item.discounts.size > 0 -%}
+                {%- for discount in item.discounts -%}
+                  <p class="cart-page-discount">{{ discount.title }}</p>
+                {%- endfor -%}
+              {%- endif -%}
+              <div class="cart-page-row">
+                <div class="cart-qty-ctrl">
+                  <button class="qty-btn" data-key="{{ item.key }}" data-action="decrease" aria-label="Decrease quantity">−</button>
+                  <span class="qty-val">{{ item.quantity }}</span>
+                  <button class="qty-btn" data-key="{{ item.key }}" data-action="increase" aria-label="Increase quantity">+</button>
+                </div>
+                <span class="cart-page-price">{{ item.final_line_price | money }}</span>
+                <button class="cart-remove" data-key="{{ item.key }}" aria-label="Remove {{ item.title | escape }}">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        {%- endfor -%}
+      </div>
+
+      <div class="cart-page-summary">
+        <h2 style="font-size:1.1rem;font-weight:500;margin-bottom:16px;">Order Summary</h2>
+        <div class="cart-summary-row"><span>Subtotal</span><span>{{ cart.total_price | money }}</span></div>
+        {%- if cart.total_discount > 0 -%}
+          <div class="cart-summary-row" style="color:var(--rose)"><span>Discounts</span><span>−{{ cart.total_discount | money }}</span></div>
+        {%- endif -%}
+        <p style="font-size:.8rem;color:var(--mid-gray);margin:12px 0 20px;">Shipping & taxes calculated at checkout</p>
+        <a href="/checkout" class="btn-primary btn-full" style="display:block;text-align:center;margin-bottom:12px;">Checkout</a>
+        <a href="/collections/all" class="btn-outline btn-full" style="display:block;text-align:center;">Continue Shopping</a>
+      </div>
+    </div>
+  {%- endif -%}
+</div>
+
+<style>
+.cart-page-layout { display:grid; grid-template-columns:1fr 340px; gap:40px; align-items:start; }
+.cart-page-item { display:flex; gap:16px; padding:20px 0; border-bottom:1px solid var(--light-gray); }
+.cart-page-img { border-radius:4px; object-fit:cover; }
+.cart-page-info { flex:1; }
+.cart-page-title { font-weight:500; text-decoration:none; color:var(--charcoal); }
+.cart-page-title:hover { color:var(--navy); }
+.cart-page-variant, .cart-page-discount { font-size:.85rem; color:var(--mid-gray); margin:4px 0 0; }
+.cart-page-discount { color:var(--rose); }
+.cart-page-row { display:flex; align-items:center; gap:16px; margin-top:12px; }
+.cart-qty-ctrl { display:flex; align-items:center; gap:0; border:1px solid var(--light-gray); border-radius:4px; }
+.qty-btn { background:none; border:none; padding:6px 12px; cursor:pointer; font-size:1rem; color:var(--charcoal); }
+.qty-btn:hover { background:var(--cream); }
+.qty-val { padding:0 12px; font-size:.9rem; min-width:24px; text-align:center; }
+.cart-page-price { font-weight:500; margin-left:auto; }
+.cart-remove { background:none; border:none; cursor:pointer; color:var(--mid-gray); padding:4px; line-height:0; }
+.cart-remove:hover { color:var(--rose); }
+.cart-page-summary { background:var(--cream); border-radius:8px; padding:24px; position:sticky; top:100px; }
+.cart-summary-row { display:flex; justify-content:space-between; margin-bottom:10px; font-size:.95rem; }
+.btn-full { width:100%; box-sizing:border-box; }
+@media (max-width:768px) {
+  .cart-page-layout { grid-template-columns:1fr; }
+  .cart-page-summary { position:static; }
+}
+</style>

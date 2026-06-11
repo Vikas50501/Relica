@@ -1,0 +1,73 @@
+<section class="wholesale-section">
+  <div class="wholesale-grid">
+    <div class="wholesale-benefits">
+      <p class="section-eyebrow">Why Partner</p>
+      <h2 class="section-title">{{ section.settings.benefits_heading }}</h2>
+      <div class="wholesale-benefit-list">
+        {%- for i in (1..3) -%}
+          {%- assign title_key = 'benefit_' | append: i | append: '_title' -%}
+          {%- assign body_key = 'benefit_' | append: i | append: '_body' -%}
+          {%- if section.settings[title_key] != blank -%}
+            <div class="wholesale-benefit">
+              <div class="wholesale-num">0{{ i }}</div>
+              <div>
+                <h4>{{ section.settings[title_key] }}</h4>
+                <p>{{ section.settings[body_key] }}</p>
+              </div>
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    </div>
+    <div class="wholesale-form-col">
+      <h3 class="wholesale-form-heading">{{ section.settings.form_heading }}</h3>
+      {%- form 'contact' -%}
+        {%- if form.posted_successfully? -%}
+          <div class="form-success">{{ section.settings.success_message }}</div>
+        {%- else -%}
+          <div class="form-row">
+            <div class="form-group"><label>Full Name *</label><input type="text" name="contact[name]" required></div>
+            <div class="form-group"><label>Email *</label><input type="email" name="contact[email]" required></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Business Name *</label><input type="text" name="contact[business_name]" required></div>
+            <div class="form-group"><label>Phone</label><input type="tel" name="contact[phone]"></div>
+          </div>
+          <div class="form-group"><label>City / State</label><input type="text" name="contact[location]"></div>
+          <div class="form-group">
+            <label>Monthly Volume Estimate</label>
+            <select name="contact[volume]">
+              <option value="">Select range</option>
+              <option value="Under ₹1 Lakh">Under ₹1 Lakh / month</option>
+              <option value="₹1–5 Lakh">₹1–5 Lakh / month</option>
+              <option value="₹5–20 Lakh">₹5–20 Lakh / month</option>
+              <option value="₹20 Lakh+">₹20 Lakh+ / month</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Tell us about your business</label><textarea name="contact[body]" rows="4"></textarea></div>
+          <button type="submit" class="btn-primary btn-full">{{ section.settings.submit_label }}</button>
+        {%- endif -%}
+      {%- endform -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Wholesale Page",
+  "settings": [
+    { "type": "text", "id": "benefits_heading", "label": "Benefits heading", "default": "Why Partner with Relica?" },
+    { "type": "text", "id": "benefit_1_title", "label": "Benefit 1 title" },
+    { "type": "textarea", "id": "benefit_1_body", "label": "Benefit 1 body" },
+    { "type": "text", "id": "benefit_2_title", "label": "Benefit 2 title" },
+    { "type": "textarea", "id": "benefit_2_body", "label": "Benefit 2 body" },
+    { "type": "text", "id": "benefit_3_title", "label": "Benefit 3 title" },
+    { "type": "textarea", "id": "benefit_3_body", "label": "Benefit 3 body" },
+    { "type": "header", "content": "Form" },
+    { "type": "text", "id": "form_heading", "label": "Form heading", "default": "Apply for Wholesale" },
+    { "type": "text", "id": "submit_label", "label": "Submit label", "default": "Submit Application" },
+    { "type": "text", "id": "success_message", "label": "Success message", "default": "Thank you! Our B2B team will contact you within 2 business days." }
+  ],
+  "presets": [{ "name": "Wholesale Page" }]
+}
+{% endschema %}

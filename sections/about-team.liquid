@@ -1,0 +1,57 @@
+{%- if section.blocks.size > 0 -%}
+<section class="team-section">
+  <div class="section-inner">
+    {%- if section.settings.eyebrow != blank -%}
+      <p class="section-eyebrow">{{ section.settings.eyebrow }}</p>
+    {%- endif -%}
+    <h2 class="section-title">{{ section.settings.title }}</h2>
+    {%- if section.settings.subtitle != blank -%}
+      <p class="team-subtitle">{{ section.settings.subtitle }}</p>
+    {%- endif -%}
+    <div class="team-grid">
+      {%- for block in section.blocks -%}
+        <div class="team-card" {{ block.shopify_attributes }}>
+          <div class="team-photo">
+            {%- if block.settings.photo != blank -%}
+              <img src="{{ block.settings.photo | image_url: width: 400 }}" alt="{{ block.settings.name }}">
+            {%- else -%}
+              <div class="team-photo-placeholder">{{ block.settings.name | slice: 0, 1 }}</div>
+            {%- endif -%}
+          </div>
+          <div class="team-info">
+            <h3 class="team-name">{{ block.settings.name }}</h3>
+            <p class="team-role">{{ block.settings.role }}</p>
+            {%- if block.settings.bio != blank -%}
+              <p class="team-bio">{{ block.settings.bio }}</p>
+            {%- endif -%}
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Team Section",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "The People" },
+    { "type": "text", "id": "title", "label": "Heading", "default": "Meet the Team" },
+    { "type": "text", "id": "subtitle", "label": "Subtitle" }
+  ],
+  "blocks": [
+    {
+      "type": "member",
+      "name": "Team Member",
+      "settings": [
+        { "type": "image_picker", "id": "photo", "label": "Photo" },
+        { "type": "text", "id": "name", "label": "Name", "default": "Team Member" },
+        { "type": "text", "id": "role", "label": "Job title / Role", "default": "Co-Founder" },
+        { "type": "textarea", "id": "bio", "label": "Short bio" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Team Section" }]
+}
+{% endschema %}

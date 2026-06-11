@@ -1,0 +1,69 @@
+{%- assign bg_image = section.settings.background_image -%}
+<div class="cat-hero {% if bg_image != blank %}cat-hero--image{% endif %}">
+  {%- if bg_image != blank -%}
+    <div class="cat-hero-bg">
+      <img src="{{ bg_image | image_url: width: 2400 }}" alt="" aria-hidden="true" loading="eager">
+      <div class="cat-hero-overlay" style="background:{{ section.settings.overlay_color }};opacity:{{ section.settings.overlay_opacity | divided_by: 100.0 }};"></div>
+    </div>
+  {%- else -%}
+    <div class="cat-hero-pattern" aria-hidden="true">
+      <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="catgrid" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse"><path d="M 60 0 L 0 0 0 60" fill="none" stroke="rgba(196,130,122,.08)" stroke-width="1"/></pattern></defs><rect width="100%" height="100%" fill="url(#catgrid)"/></svg>
+    </div>
+  {%- endif -%}
+
+  <div class="cat-hero-inner">
+    <nav class="cat-breadcrumb" aria-label="Breadcrumb">
+      <a href="{{ routes.root_url }}">Home</a>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 18 15 12 9 6"/></svg>
+      <span>Catalogue</span>
+    </nav>
+    <p class="cat-eyebrow">{{ section.settings.eyebrow }}</p>
+    <h1 class="cat-hero-title">{{ section.settings.title_plain }} <em>{{ section.settings.title_italic }}</em></h1>
+    {%- if section.settings.subtitle != blank -%}
+      <p class="cat-hero-sub">{{ section.settings.subtitle }}</p>
+    {%- endif -%}
+    <div class="cat-hero-stats">
+      {%- assign total_collections = collections | map: 'handle' | size -%}
+      <div class="cat-stat">
+        <span class="cat-stat-num">{{ collections.size }}</span>
+        <span class="cat-stat-label">Collections</span>
+      </div>
+      {%- if section.settings.stat2_num != blank -%}
+        <div class="cat-stat-div"></div>
+        <div class="cat-stat">
+          <span class="cat-stat-num">{{ section.settings.stat2_num }}</span>
+          <span class="cat-stat-label">{{ section.settings.stat2_label }}</span>
+        </div>
+      {%- endif -%}
+      {%- if section.settings.stat3_num != blank -%}
+        <div class="cat-stat-div"></div>
+        <div class="cat-stat">
+          <span class="cat-stat-num">{{ section.settings.stat3_num }}</span>
+          <span class="cat-stat-label">{{ section.settings.stat3_label }}</span>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Catalogue Hero",
+  "settings": [
+    { "type": "image_picker", "id": "background_image", "label": "Background image (optional)" },
+    { "type": "color", "id": "overlay_color", "label": "Overlay colour", "default": "#0F1F33" },
+    { "type": "range", "id": "overlay_opacity", "label": "Overlay opacity %", "min": 0, "max": 90, "step": 5, "default": 70 },
+    { "type": "header", "content": "Text" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Our Catalogue" },
+    { "type": "text", "id": "title_plain", "label": "Title — plain words", "default": "Browse Our" },
+    { "type": "text", "id": "title_italic", "label": "Title — italic word", "default": "Collections" },
+    { "type": "textarea", "id": "subtitle", "label": "Subtitle text", "default": "Discover premium cookware crafted for every kitchen — from everyday essentials to professional-grade series." },
+    { "type": "header", "content": "Stats (optional)" },
+    { "type": "text", "id": "stat2_num", "label": "Stat 2 — number", "default": "500+" },
+    { "type": "text", "id": "stat2_label", "label": "Stat 2 — label", "default": "Products" },
+    { "type": "text", "id": "stat3_num", "label": "Stat 3 — number", "default": "15+" },
+    { "type": "text", "id": "stat3_label", "label": "Stat 3 — label", "default": "Years of Craft" }
+  ],
+  "presets": [{ "name": "Catalogue Hero" }]
+}
+{% endschema %}

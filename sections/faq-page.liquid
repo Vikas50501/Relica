@@ -1,0 +1,112 @@
+<section class="faq-section" style="background:{{ section.settings.bg_color }};">
+  <div class="faq-inner">
+    {%- if section.settings.show_search -%}
+      <div class="faq-search-wrap">
+        <input type="text" id="faq-search" placeholder="{{ section.settings.search_placeholder }}" class="faq-search">
+        <svg class="faq-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      </div>
+    {%- endif -%}
+
+    {%- if section.settings.show_categories -%}
+      <div class="faq-cats">
+        <button class="faq-cat active" data-cat="all">All</button>
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'category' -%}
+            <button class="faq-cat" data-cat="{{ block.settings.title | handle }}" {{ block.shopify_attributes }}>{{ block.settings.title }}</button>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    <div class="faq-list">
+      {%- assign current_cat = '' -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'category' -%}
+          {%- assign current_cat = block.settings.title | handle -%}
+        {%- elsif block.type == 'faq' -%}
+          <details class="faq-item" data-cat="{{ current_cat }}" {{ block.shopify_attributes }}>
+            <summary class="faq-q">
+              {{ block.settings.question }}
+              <span class="faq-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="6 9 12 15 18 9"/></svg></span>
+            </summary>
+            <div class="faq-a">{{ block.settings.answer }}</div>
+          </details>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+    {%- if section.settings.cta_heading != blank -%}
+      <div class="faq-cta">
+        <h3>{{ section.settings.cta_heading }}</h3>
+        <p>{{ section.settings.cta_body }}</p>
+        <a href="{{ section.settings.cta_btn_url }}" class="btn-primary">{{ section.settings.cta_btn_label }}</a>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+<script>
+  (function(){
+    const search = document.getElementById('faq-search');
+    const cats = document.querySelectorAll('.faq-cat');
+    const items = document.querySelectorAll('.faq-item');
+    let activeCat = 'all';
+
+    function filter(){
+      const q = search ? search.value.toLowerCase() : '';
+      items.forEach(item => {
+        const question = item.querySelector('.faq-q').textContent.toLowerCase();
+        const answer = item.querySelector('.faq-a').textContent.toLowerCase();
+        const matchSearch = !q || question.includes(q) || answer.includes(q);
+        const matchCat = activeCat === 'all' || item.dataset.cat === activeCat;
+        item.style.display = (matchSearch && matchCat) ? '' : 'none';
+      });
+    }
+
+    if(search) search.addEventListener('input', filter);
+    cats.forEach(btn => {
+      btn.addEventListener('click', () => {
+        cats.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeCat = btn.dataset.cat;
+        filter();
+      });
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "FAQ Page",
+  "settings": [
+    { "type": "checkbox", "id": "show_search", "label": "Show search", "default": true },
+    { "type": "text", "id": "search_placeholder", "label": "Search placeholder", "default": "Search questions..." },
+    { "type": "checkbox", "id": "show_categories", "label": "Show category filter", "default": true },
+    { "type": "color", "id": "bg_color", "label": "Background color", "default": "#FDFAF6" },
+    { "type": "header", "content": "Bottom CTA" },
+    { "type": "text", "id": "cta_heading", "label": "CTA heading" },
+    { "type": "text", "id": "cta_body", "label": "CTA body text" },
+    { "type": "text", "id": "cta_btn_label", "label": "CTA button label" },
+    { "type": "url", "id": "cta_btn_url", "label": "CTA button URL" }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Category name", "default": "Category" }
+      ]
+    },
+    {
+      "type": "faq",
+      "name": "FAQ Item",
+      "settings": [
+        { "type": "text", "id": "category", "label": "Category (must match category name above)" },
+        { "type": "text", "id": "question", "label": "Question", "default": "What is your question?" },
+        { "type": "richtext", "id": "answer", "label": "Answer" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "FAQ Page" }]
+}
+{% endschema %}

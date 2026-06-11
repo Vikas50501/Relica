@@ -1,0 +1,37 @@
+{%- if section.settings.heading != blank -%}
+<section class="cart-recs-section">
+  <div class="section-inner">
+    <h3 class="section-eyebrow" style="margin-bottom:24px;">{{ section.settings.heading }}</h3>
+    <div class="product-recs-grid" id="cart-recs">
+      <!-- Populated by JS via Shopify Recommendations API -->
+    </div>
+  </div>
+</section>
+<script>
+  fetch('/recommendations/products.json?section_id={{ section.id }}&product_count={{ section.settings.products_to_show }}')
+    .then(r=>r.json()).then(d=>{
+      const grid = document.getElementById('cart-recs');
+      if(grid && d.products) {
+        grid.innerHTML = d.products.map(p=>`
+          <a class="product-card" href="${p.url}">
+            <div class="product-img"><img src="${p.images[0]?.src?.replace('.jpg','_400x.jpg')}" alt="${p.title}" loading="lazy"></div>
+            <div class="product-info">
+              <p class="product-name">${p.title}</p>
+              <p class="product-price">${p.price_varies?'From ':''}${new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',minimumFractionDigits:0}).format(p.price/100)}</p>
+            </div>
+          </a>`).join('');
+      }
+    }).catch(()=>{});
+</script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Cart Recommendations",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "You May Also Like" },
+    { "type": "range", "id": "products_to_show", "label": "Products to show", "min": 2, "max": 6, "step": 1, "default": 4 }
+  ],
+  "presets": [{ "name": "Cart Recommendations" }]
+}
+{% endschema %}

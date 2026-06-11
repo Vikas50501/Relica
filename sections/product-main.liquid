@@ -1,0 +1,949 @@
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+{%- assign product_form_id = 'product-form-' | append: product.id -%}
+{%- assign on_sale = false -%}
+{%- if current_variant.compare_at_price > current_variant.price -%}
+  {%- assign on_sale = true -%}
+{%- endif -%}
+{%- assign savings_pct = current_variant.compare_at_price | minus: current_variant.price | times: 100 | divided_by: current_variant.compare_at_price -%}
+
+{%- comment -%} ════════════════════════════════════════
+    BREADCRUMB
+════════════════════════════════════════ {%- endcomment -%}
+<nav class="prod-breadcrumb" aria-label="Breadcrumb">
+  <div class="prod-breadcrumb-inner">
+    <a href="{{ routes.root_url }}">Home</a>
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 18 15 12 9 6"/></svg>
+    {%- if product.collections.first -%}
+      <a href="{{ product.collections.first.url }}">{{ product.collections.first.title }}</a>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 18 15 12 9 6"/></svg>
+    {%- endif -%}
+    <span>{{ product.title }}</span>
+  </div>
+</nav>
+
+{%- comment -%} ════════════════════════════════════════
+    PRODUCT LAYOUT
+════════════════════════════════════════ {%- endcomment -%}
+<div class="prod-layout">
+
+  {%- comment -%} ── LEFT: IMAGE GALLERY ── {%- endcomment -%}
+  <div class="prod-gallery" id="ProdGallery">
+
+    {%- comment -%} THUMBNAILS {%- endcomment -%}
+    <div class="prod-thumbs" id="ProdThumbs" role="list" aria-label="Product images">
+      {%- for media in product.media -%}
+        <button
+          class="prod-thumb{% if forloop.first %} prod-thumb--active{% endif %}"
+          data-index="{{ forloop.index0 }}"
+          data-media-type="{{ media.media_type }}"
+          aria-label="View image {{ forloop.index }}"
+          aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}"
+          role="listitem"
+          onclick="prodGotoSlide({{ forloop.index0 }})"
+        >
+          {%- if media.media_type == 'video' or media.media_type == 'external_video' -%}
+            <img src="{{ media.preview_image | image_url: width: 160 }}" alt="{{ media.alt | escape }}" loading="lazy" width="88" height="88">
+            <span class="prod-thumb-play prod-thumb-badge prod-thumb-badge--video">▶ Video</span>
+          {%- elsif media.media_type == 'model' -%}
+            <img src="{{ media.preview_image | image_url: width: 160 }}" alt="{{ media.alt | escape }}" loading="lazy" width="88" height="88">
+            <span class="prod-thumb-3d prod-thumb-badge prod-thumb-badge--3d">3D</span>
+          {%- else -%}
+            <img src="{{ media | image_url: width: 160 }}" alt="{{ media.alt | default: product.title | escape }}" loading="{% if forloop.first %}eager{% else %}lazy{% endif %}" width="88" height="88">
+          {%- endif -%}
+        </button>
+      {%- else -%}
+        <button class="prod-thumb prod-thumb--active" aria-label="Product image" aria-pressed="true" onclick="prodGotoSlide(0)">
+          <div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;color:var(--light-gray);">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          </div>
+        </button>
+      {%- endfor -%}
+    </div>
+
+    {%- comment -%} MAIN VIEWER {%- endcomment -%}
+    <div class="prod-main-media" id="ProdViewer">
+      <div class="prod-media-track" id="ProdMediaTrack">
+
+        {%- for media in product.media -%}
+          <div class="prod-media-slide{% if forloop.first %} prod-media-slide--active{% endif %}" data-index="{{ forloop.index0 }}" data-media-type="{{ media.media_type }}">
+            {%- case media.media_type -%}
+              {%- when 'image' -%}
+                <div class="prod-img-zoom" onclick="prodOpenLightbox({{ forloop.index0 }})">
+                  <img
+                    class="prod-main-img"
+                    src="{{ media | image_url: width: 900 }}"
+                    alt="{{ media.alt | default: product.title | escape }}"
+                    loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+                    width="900"
+                    srcset="{{ media | image_url: width: 480 }} 480w, {{ media | image_url: width: 720 }} 720w, {{ media | image_url: width: 900 }} 900w"
+                    sizes="(max-width:680px) 100vw, (max-width:1100px) 55vw, 580px"
+                  >
+                </div>
+              {%- when 'video' -%}
+                <video class="prod-video" autoplay muted loop playsinline>
+                  {%- for source in media.sources -%}
+                    <source src="{{ source.url }}" type="{{ source.mime_type }}">
+                  {%- endfor -%}
+                </video>
+              {%- when 'external_video' -%}
+                {%- if media.host == 'youtube' -%}
+                  <iframe src="https://www.youtube.com/embed/{{ media.external_id }}?autoplay=0&mute=1&rel=0" title="{{ media.alt | escape }}" allow="autoplay; encrypted-media" allowfullscreen loading="lazy" style="width:100%;height:100%;border:0;"></iframe>
+                {%- elsif media.host == 'vimeo' -%}
+                  <iframe src="https://player.vimeo.com/video/{{ media.external_id }}?autoplay=0&muted=1" title="{{ media.alt | escape }}" allow="autoplay; fullscreen" allowfullscreen loading="lazy" style="width:100%;height:100%;border:0;"></iframe>
+                {%- endif -%}
+              {%- when 'model' -%}
+                <model-viewer
+                  src="{{ media.sources.first.url }}"
+                  alt="{{ media.alt | default: product.title | escape }}"
+                  class="prod-model"
+                  camera-controls
+                  auto-rotate
+                  ar
+                  ar-modes="webxr scene-viewer quick-look"
+                  interaction-prompt="none"
+                  loading="lazy"
+                ></model-viewer>
+            {%- endcase -%}
+          </div>
+        {%- else -%}
+          <div class="prod-media-slide prod-media-slide--active" data-index="0" data-media-type="image">
+            <div class="prod-img-zoom" style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--light-gray);">
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width=".7"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            </div>
+          </div>
+        {%- endfor -%}
+
+      </div>{%- comment -%} end track {%- endcomment -%}
+
+      {%- comment -%} Badges {%- endcomment -%}
+      <div class="prod-badges" aria-hidden="true">
+        {%- unless current_variant.available -%}
+          <span class="prod-badge prod-badge--sold-out">Sold Out</span>
+        {%- endunless -%}
+        {%- if on_sale and current_variant.available -%}
+          <span class="prod-badge prod-badge--sale">−{{ savings_pct }}%</span>
+        {%- endif -%}
+        {%- for tag in product.tags -%}
+          {%- if tag == 'new' or tag == 'New' -%}<span class="prod-badge" style="background:var(--sage);color:#fff;">New</span>{%- endif -%}
+          {%- if tag == 'bestseller' or tag == 'best-seller' -%}<span class="prod-badge" style="background:var(--navy);color:#fff;">Bestseller</span>{%- endif -%}
+        {%- endfor -%}
+      </div>
+
+      {%- comment -%} Gallery nav arrows — only show if >1 media {%- endcomment -%}
+      {%- if product.media.size > 1 -%}
+        <button class="prod-gallery-nav prod-gallery-nav--prev" onclick="prodShiftSlide(-1)" aria-label="Previous image">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="prod-gallery-nav prod-gallery-nav--next" onclick="prodShiftSlide(1)" aria-label="Next image">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <div class="prod-gallery-dots" id="ProdDots" aria-hidden="true">
+          {%- for media in product.media -%}
+            <button class="prod-dot{% if forloop.first %} prod-dot--active{% endif %}" data-index="{{ forloop.index0 }}" onclick="prodGotoSlide({{ forloop.index0 }})" aria-label="Image {{ forloop.index }}"></button>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+
+      {%- comment -%} Zoom button {%- endcomment -%}
+      <button class="prod-zoom-btn" onclick="prodOpenLightbox(prodCurrentIndex)" aria-label="View full size">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35M11 8v6M8 11h6"/></svg>
+      </button>
+
+    </div>{%- comment -%} end .prod-main-media {%- endcomment -%}
+  </div>{%- comment -%} end .prod-gallery {%- endcomment -%}
+
+  {%- comment -%} ── RIGHT: PRODUCT INFO ── {%- endcomment -%}
+  <div class="prod-info" id="ProdInfo">
+
+    {%- comment -%} Vendor / Series {%- endcomment -%}
+    {%- if product.vendor != blank -%}
+      <p class="prod-vendor">{{ product.vendor }}</p>
+    {%- elsif product.product_type != blank -%}
+      <p class="prod-vendor">{{ product.product_type }}</p>
+    {%- endif -%}
+
+    {%- comment -%} Title {%- endcomment -%}
+    <h1 class="prod-title">{{ product.title }}</h1>
+
+    {%- comment -%} RATING (reads from metafields — works with Judge.me, Okendo, etc.) {%- endcomment -%}
+    {%- if product.metafields.reviews.rating.value != blank -%}
+      {%- assign r_val = product.metafields.reviews.rating.value | times: 1.0 -%}
+      {%- assign r_count = product.metafields.reviews.rating_count.value | default: 0 -%}
+      <div class="prod-rating-row">
+        <div class="prod-stars" aria-label="Rated {{ r_val }} out of 5 stars">
+          {%- for i in (1..5) -%}
+            {%- assign filled = false -%}
+            {%- if i <= r_val -%}{%- assign filled = true -%}{%- endif -%}
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="{% if filled %}var(--rose){% else %}none{% endif %}" stroke="var(--rose)" stroke-width="1.2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+          {%- endfor -%}
+        </div>
+        {%- if r_count > 0 -%}
+          <span class="prod-rating-text">{{ r_val | round: 1 }} / 5.0</span>
+          <a href="#tab-reviews" class="prod-rating-link" onclick="prodOpenTab('reviews')">{{ r_count }} reviews</a>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- comment -%} PRICE {%- endcomment -%}
+    <div class="prod-price-block" id="ProdPriceBlock">
+      {%- if product.price_varies -%}
+        <span class="prod-price-from">From</span>
+      {%- endif -%}
+      {%- if on_sale -%}
+        <span class="prod-price prod-price--sale">{{ current_variant.price | money }}</span>
+        <span class="prod-price prod-price--compare">{{ current_variant.compare_at_price | money }}</span>
+        <span class="prod-price-save">Save {{ savings_pct }}%</span>
+      {%- else -%}
+        <span class="prod-price">{{ current_variant.price | money }}</span>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%} SKU + Availability {%- endcomment -%}
+    <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:14px;">
+      {%- if section.settings.show_sku and current_variant.sku != blank -%}
+        <p class="prod-sku">SKU: <span id="ProdSku">{{ current_variant.sku }}</span></p>
+      {%- endif -%}
+      <div class="prod-availability" id="ProdAvailability">
+        {%- if current_variant.available -%}
+          <span class="prod-availability-dot prod-availability-dot--in"></span>
+          {%- assign inventory = current_variant.inventory_quantity -%}
+          {%- if current_variant.inventory_management == 'shopify' and inventory > 0 and inventory <= 5 -%}
+            <span class="prod-availability-text">In stock</span>
+            <span class="prod-availability-low">Only {{ inventory }} left</span>
+          {%- else -%}
+            <span class="prod-availability-text">In stock</span>
+          {%- endif -%}
+        {%- else -%}
+          <span class="prod-availability-dot prod-availability-dot--out"></span>
+          <span class="prod-availability-text prod-availability-text--out">Sold out</span>
+        {%- endif -%}
+      </div>
+    </div>
+
+    {%- comment -%} Short description {%- endcomment -%}
+    {%- if product.description != blank -%}
+      <p class="prod-short-desc">{{ product.description | strip_html | truncatewords: 40 }}</p>
+    {%- endif -%}
+
+    {%- comment -%} ── VARIANT OPTIONS ── {%- endcomment -%}
+    {%- unless product.has_only_default_variant -%}
+      {%- for option in product.options_with_values -%}
+        {%- assign opt_name_lower = option.name | downcase -%}
+        {%- assign is_color = false -%}
+        {%- if opt_name_lower == 'color' or opt_name_lower == 'colour' -%}{%- assign is_color = true -%}{%- endif -%}
+        {%- assign is_size = false -%}
+        {%- if opt_name_lower == 'size' or opt_name_lower == 'capacity' or opt_name_lower == 'volume' -%}{%- assign is_size = true -%}{%- endif -%}
+
+        <div class="prod-option" id="option-{{ option.name | handleize }}">
+          <div class="prod-option-header">
+            <span class="prod-option-label">{{ option.name }}</span>
+            <span class="prod-option-selected" id="selected-{{ option.name | handleize }}">{{ option.selected_value }}</span>
+          </div>
+
+          {%- if is_color -%}
+            <div class="prod-colors" role="radiogroup" aria-label="{{ option.name }}">
+              {%- for value in option.values -%}
+                <button
+                  class="prod-color-swatch{% if option.selected_value == value %} prod-color-swatch--active{% endif %}"
+                  data-option="{{ option.name }}"
+                  data-value="{{ value }}"
+                  style="background:{{ value | downcase | replace: ' ', '' }};"
+                  aria-label="{{ value }}"
+                  title="{{ value }}"
+                  onclick="prodSelectOption(this, '{{ option.name }}', '{{ value }}')"
+                ></button>
+              {%- endfor -%}
+            </div>
+          {%- elsif is_size -%}
+            <div class="prod-sizes" role="radiogroup" aria-label="{{ option.name }}">
+              {%- for value in option.values -%}
+                <button
+                  class="prod-size-btn{% if option.selected_value == value %} prod-size-btn--active{% endif %}"
+                  data-option="{{ option.name }}"
+                  data-value="{{ value }}"
+                  aria-label="{{ value }}"
+                  onclick="prodSelectOption(this, '{{ option.name }}', '{{ value }}')"
+                >{{ value }}</button>
+              {%- endfor -%}
+            </div>
+          {%- else -%}
+            <div class="prod-option-pills" role="radiogroup" aria-label="{{ option.name }}">
+              {%- for value in option.values -%}
+                <button
+                  class="prod-pill{% if option.selected_value == value %} prod-pill--active{% endif %}"
+                  data-option="{{ option.name }}"
+                  data-value="{{ value }}"
+                  aria-label="{{ value }}"
+                  onclick="prodSelectOption(this, '{{ option.name }}', '{{ value }}')"
+                >{{ value }}</button>
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    {%- endunless -%}
+
+    {%- comment -%} ── QUANTITY + ADD TO CART ── {%- endcomment -%}
+    <div class="prod-qty-row">
+      <div class="prod-qty-ctrl" role="group" aria-label="Quantity">
+        <button class="prod-qty-btn" id="ProdQtyMinus" aria-label="Decrease quantity" onclick="prodQty(-1)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <input type="number" class="prod-qty-input" id="ProdQtyInput" value="1" min="1" max="99" aria-label="Quantity" onchange="prodSyncQty(this.value)">
+        <button class="prod-qty-btn" id="ProdQtyPlus" aria-label="Increase quantity" onclick="prodQty(1)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+      </div>
+    </div>
+
+    {%- form 'product', product, id: product_form_id, novalidate: 'novalidate' -%}
+      <input type="hidden" name="id" id="ProdVariantId" value="{{ current_variant.id }}">
+      <input type="hidden" name="quantity" id="ProdFormQty" value="1">
+
+      <div class="prod-ctas">
+        <button
+          type="submit"
+          id="ProdAddBtn"
+          class="prod-add-btn{% unless current_variant.available %} prod-add-btn--disabled{% endunless %}"
+          {% unless current_variant.available %}disabled aria-disabled="true"{% endunless %}
+        >
+          <svg id="ProdAddIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <span id="ProdAddLabel">
+            {%- if current_variant.available -%}Add to Cart{%- else -%}Sold Out{%- endif -%}
+          </span>
+        </button>
+        {%- if section.settings.show_buy_now -%}
+          <button type="button" class="prod-buy-btn" id="ProdBuyNow" onclick="prodBuyNow()">Buy Now</button>
+        {%- endif -%}
+      </div>
+
+    {%- endform -%}
+
+    {%- comment -%} Secondary actions {%- endcomment -%}
+    <div class="prod-secondary-actions">
+      <button class="prod-sec-btn" id="WishlistBtn" onclick="prodToggleWishlist(this, '{{ product.id }}')" aria-label="Save to wishlist">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        Save
+      </button>
+      <button class="prod-sec-btn" onclick="prodShare()" aria-label="Share product">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Share
+      </button>
+      <a href="/collections/all" class="prod-sec-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="15 18 9 12 15 6"/></svg>
+        Continue Shopping
+      </a>
+    </div>
+
+    {%- comment -%} Trust strip {%- endcomment -%}
+    <div class="prod-trust-strip">
+      <div class="prod-trust-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span>{{ section.settings.trust1 | default: 'Up to 5-Year Warranty' }}</span>
+      </div>
+      <div class="prod-trust-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+        <span>{{ section.settings.trust2 | default: 'ISI Certified · PFOA Free' }}</span>
+      </div>
+      <div class="prod-trust-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+        <span>{{ section.settings.trust3 | default: 'Free Delivery Above ₹999' }}</span>
+      </div>
+      <div class="prod-trust-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>{{ section.settings.trust4 | default: 'Made for Indian Kitchens' }}</span>
+      </div>
+    </div>
+
+    {%- comment -%} ── ACCORDION TABS (Description / Specifications / Compatibility / Shipping) ── {%- endcomment -%}
+    <div class="prod-tabs" role="tablist">
+      <div class="prod-tab-list">
+        <button class="prod-tab active" role="tab" aria-selected="true" data-tab="description" onclick="prodOpenTab('description')">Description</button>
+        {%- if section.settings.show_specs -%}
+          <button class="prod-tab" role="tab" aria-selected="false" data-tab="specs" onclick="prodOpenTab('specs')">Specifications</button>
+        {%- endif -%}
+        {%- if section.settings.show_compat -%}
+          <button class="prod-tab" role="tab" aria-selected="false" data-tab="compat" onclick="prodOpenTab('compat')">Compatibility</button>
+        {%- endif -%}
+        {%- if section.settings.show_shipping -%}
+          <button class="prod-tab" role="tab" aria-selected="false" data-tab="shipping" onclick="prodOpenTab('shipping')">Shipping & Returns</button>
+        {%- endif -%}
+        {%- if section.settings.show_reviews -%}
+          <button class="prod-tab" role="tab" aria-selected="false" data-tab="reviews" id="tab-reviews" onclick="prodOpenTab('reviews')">Reviews</button>
+        {%- endif -%}
+      </div>
+
+      {%- comment -%} Description {%- endcomment -%}
+      <div class="prod-tab-panel" id="tabpanel-description" role="tabpanel">
+        {%- if product.description != blank -%}
+          <div class="prod-tab-body rte">{{ product.description }}</div>
+        {%- else -%}
+          <p class="prod-tab-body" style="color:var(--mid-gray);">No description provided.</p>
+        {%- endif -%}
+      </div>
+
+      {%- comment -%} Specifications {%- endcomment -%}
+      {%- if section.settings.show_specs -%}
+        <div class="prod-tab-panel" id="tabpanel-specs" role="tabpanel" style="display:none;">
+          <div class="prod-tab-body">
+            <table class="prod-specs-table">
+              <tbody>
+                {%- for block in section.blocks -%}
+                  {%- if block.type == 'spec_row' -%}
+                    <tr {{ block.shopify_attributes }}>
+                      <td>{{ block.settings.label }}</td>
+                      <td>{{ block.settings.value }}</td>
+                    </tr>
+                  {%- endif -%}
+                {%- endfor -%}
+                {%- if product.metafields.specs.material != blank -%}<tr><td>Material</td><td>{{ product.metafields.specs.material }}</td></tr>{%- endif -%}
+                {%- if product.metafields.specs.capacity != blank -%}<tr><td>Capacity</td><td>{{ product.metafields.specs.capacity }}</td></tr>{%- endif -%}
+                {%- if product.metafields.specs.base_thickness != blank -%}<tr><td>Base Thickness</td><td>{{ product.metafields.specs.base_thickness }}</td></tr>{%- endif -%}
+                {%- if product.metafields.specs.coating != blank -%}<tr><td>Coating</td><td>{{ product.metafields.specs.coating }}</td></tr>{%- endif -%}
+                {%- if product.metafields.specs.weight != blank -%}<tr><td>Weight</td><td>{{ product.metafields.specs.weight }}</td></tr>{%- endif -%}
+                {%- if product.metafields.specs.warranty != blank -%}<tr><td>Warranty</td><td>{{ product.metafields.specs.warranty }}</td></tr>{%- endif -%}
+                {%- if product.metafields.specs.certification != blank -%}<tr><td>Certification</td><td>{{ product.metafields.specs.certification }}</td></tr>{%- endif -%}
+                {%- if product.metafields.specs.dimensions != blank -%}<tr><td>Dimensions</td><td>{{ product.metafields.specs.dimensions }}</td></tr>{%- endif -%}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      {%- endif -%}
+
+      {%- comment -%} Cooktop Compatibility {%- endcomment -%}
+      {%- if section.settings.show_compat -%}
+        <div class="prod-tab-panel" id="tabpanel-compat" role="tabpanel" style="display:none;">
+          <div class="prod-tab-body">
+            {%- if section.settings.compat_intro != blank -%}
+              <p>{{ section.settings.compat_intro }}</p>
+            {%- endif -%}
+            <div style="display:flex;gap:36px;flex-wrap:wrap;align-items:center;background:var(--navy);padding:32px;margin-top:16px;width:fit-content;">
+              {%- assign compat_list = 'Gas,Induction,Electric,Ceramic,Halogen,Dishwasher' | split: ',' -%}
+              {%- for c in compat_list -%}
+                <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+                  <div class="compat-circle">
+                    {%- if forloop.index == 1 -%}<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="1.5"><circle cx="12" cy="12" r="5"/><path d="M12 2v3M12 19v3M3 12h3M18 12h3"/></svg>
+                    {%- elsif forloop.index == 2 -%}<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 10h10M7 14h6"/></svg>
+                    {%- elsif forloop.index == 3 -%}<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="1.5"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2"/></svg>
+                    {%- elsif forloop.index == 4 -%}<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="1.5"><ellipse cx="12" cy="12" rx="9" ry="5"/><path d="M3 12c0 4 4 7 9 7s9-3 9-7"/></svg>
+                    {%- elsif forloop.index == 5 -%}<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    {%- else -%}<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="1.5"><path d="M4 7h16M4 12h10"/><circle cx="17" cy="17" r="3"/></svg>
+                    {%- endif -%}
+                  </div>
+                  <span class="compat-label">{{ c }}</span>
+                </div>
+              {%- endfor -%}
+            </div>
+          </div>
+        </div>
+      {%- endif -%}
+
+      {%- comment -%} Shipping & Returns {%- endcomment -%}
+      {%- if section.settings.show_shipping -%}
+        <div class="prod-tab-panel" id="tabpanel-shipping" role="tabpanel" style="display:none;">
+          <div class="prod-tab-body">
+            {%- if section.settings.shipping_text != blank -%}
+              {{ section.settings.shipping_text }}
+            {%- else -%}
+              <p><strong>Free Delivery</strong> on all orders above ₹999.</p>
+              <p><strong>Standard Delivery:</strong> 3–7 business days across India.</p>
+              <p><strong>Returns:</strong> 7-day hassle-free returns on unused, sealed products. Contact our support team to initiate a return.</p>
+              <p>For bulk or institutional orders, please write to <a href="mailto:info@relicainnovations.com">info@relicainnovations.com</a>.</p>
+            {%- endif -%}
+          </div>
+        </div>
+      {%- endif -%}
+
+      {%- comment -%} Reviews {%- endcomment -%}
+      {%- if section.settings.show_reviews -%}
+        <div class="prod-tab-panel" id="tabpanel-reviews" role="tabpanel" style="display:none;">
+          <div class="prod-tab-body">
+            <div id="shopify-product-reviews" data-id="{{ product.id }}">{{ product.metafields.spr.reviews }}</div>
+          </div>
+        </div>
+      {%- endif -%}
+
+    </div>{%- comment -%} end .prod-tabs {%- endcomment -%}
+
+  </div>{%- comment -%} end .prod-info {%- endcomment -%}
+</div>{%- comment -%} end .prod-layout {%- endcomment -%}
+
+{%- comment -%} ════════════════════════════════════════
+    PRODUCT RECOMMENDATIONS
+════════════════════════════════════════ {%- endcomment -%}
+{%- if section.settings.show_related -%}
+  {%- assign related_collection = product.collections.first -%}
+  {%- if related_collection != blank -%}
+    <section class="prod-recs">
+      <div class="prod-recs-inner">
+        <div class="prod-recs-header reveal">
+          <p class="section-eyebrow">{{ section.settings.related_eyebrow | default: 'From the Same Series' }}</p>
+          <h2 class="section-title">{{ section.settings.related_title_plain | default: 'You May Also' }} <em>{{ section.settings.related_title_italic | default: 'Like' }}</em></h2>
+        </div>
+        <div class="prod-recs-grid">
+          {%- assign shown = 0 -%}
+          {%- for rp in related_collection.products limit: 8 -%}
+            {%- unless rp.id == product.id or shown >= 4 -%}
+              {%- assign shown = shown | plus: 1 -%}
+              <a href="{{ rp.url }}" class="coll-pc reveal reveal-delay-{{ shown }}" style="text-decoration:none;">
+                <div class="coll-pc-img-area">
+                  <div class="coll-pc-img-link" style="display:block;aspect-ratio:1;background:var(--off-white);">
+                    <div class="coll-pc-img-wrap">
+                      {%- if rp.featured_image -%}
+                        <img class="coll-pc-img coll-pc-img--a" src="{{ rp.featured_image | image_url: width: 540, height: 540, crop: 'center' }}" alt="{{ rp.featured_image.alt | default: rp.title | escape }}" loading="lazy" width="540" height="540">
+                        {%- if rp.images[1] -%}
+                          <img class="coll-pc-img coll-pc-img--b" src="{{ rp.images[1] | image_url: width: 540, height: 540, crop: 'center' }}" alt="" loading="lazy" width="540" height="540">
+                        {%- endif -%}
+                      {%- else -%}
+                        <div class="coll-pc-no-img"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width=".8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+                      {%- endif -%}
+                    </div>
+                  </div>
+                  {%- if rp.compare_at_price > rp.price -%}
+                    <div class="coll-pc-badges"><span class="coll-pc-badge coll-pc-badge--sale">Sale</span></div>
+                  {%- endif -%}
+                </div>
+                <div class="coll-pc-info">
+                  {%- if rp.product_type != blank -%}<span class="coll-pc-vendor">{{ rp.product_type }}</span>{%- endif -%}
+                  <h3 class="coll-pc-title" style="font-size:15px;">{{ rp.title }}</h3>
+                  <div class="coll-pc-price-row">
+                    {%- if rp.compare_at_price > rp.price -%}
+                      <span class="coll-pc-price coll-pc-price--sale">{{ rp.price | money }}</span>
+                      <span class="coll-pc-price coll-pc-price--was">{{ rp.compare_at_price | money }}</span>
+                    {%- else -%}
+                      <span class="coll-pc-price">{%- if rp.price_varies -%}From {%- endif -%}{{ rp.price_min | money }}</span>
+                    {%- endif -%}
+                  </div>
+                </div>
+              </a>
+            {%- endunless -%}
+          {%- endfor -%}
+        </div>
+      </div>
+    </section>
+  {%- endif -%}
+{%- endif -%}
+
+{%- comment -%} ════════════════════════════════════════
+    LIGHTBOX
+════════════════════════════════════════ {%- endcomment -%}
+<div class="prod-lightbox" id="ProdLightbox" role="dialog" aria-modal="true" aria-label="Image lightbox">
+  <button class="prod-lightbox-close" onclick="prodCloseLightbox()" aria-label="Close lightbox">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+  <button class="prod-lightbox-nav prod-lightbox-nav--prev" onclick="prodLbShift(-1)" aria-label="Previous image">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <img class="prod-lightbox-img" id="ProdLbImg" src="" alt="">
+  <button class="prod-lightbox-nav prod-lightbox-nav--next" onclick="prodLbShift(1)" aria-label="Next image">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+</div>
+
+{%- comment -%} Toast (reuse global or define locally if not on page) {%- endcomment -%}
+<div class="relica-toast" id="ProdToast" role="alert" aria-live="polite"></div>
+
+{%- comment -%} ════════════════════════════════════════
+    JAVASCRIPT
+════════════════════════════════════════ {%- endcomment -%}
+<script>
+(function(){
+  'use strict';
+
+  /* ── VARIANT DATA ── */
+  var variants     = {{ product.variants | json }};
+  var mediaByVariant = {};
+  {%- for variant in product.variants -%}
+    {%- if variant.featured_media -%}
+      mediaByVariant[{{ variant.id }}] = {{ variant.featured_media.position | minus: 1 }};
+    {%- endif -%}
+  {%- endfor -%}
+
+  var selectedOpts = {
+    {%- for option in product.options_with_values -%}
+      {{ option.position }}: '{{ option.selected_value | escape }}'
+      {%- unless forloop.last -%},{%- endunless -%}
+    {%- endfor -%}
+  };
+
+  /* ── GALLERY ── */
+  var mediaCount  = {{ product.media.size }};
+  var currentIdx  = 0;
+  window.prodCurrentIndex = 0;
+
+  window.prodGotoSlide = function(idx) {
+    if (idx < 0) idx = mediaCount - 1;
+    if (idx >= mediaCount) idx = 0;
+    currentIdx = idx;
+    window.prodCurrentIndex = idx;
+
+    document.querySelectorAll('.prod-media-slide').forEach(function(s, i) {
+      s.classList.toggle('prod-media-slide--active', i === idx);
+    });
+    document.querySelectorAll('.prod-thumb').forEach(function(t, i) {
+      t.classList.toggle('prod-thumb--active', i === idx);
+      t.setAttribute('aria-pressed', i === idx ? 'true' : 'false');
+    });
+    document.querySelectorAll('.prod-dot').forEach(function(d, i) {
+      d.classList.toggle('prod-dot--active', i === idx);
+    });
+
+    /* Scroll thumb into view */
+    var thumbEl = document.querySelector('.prod-thumb[data-index="' + idx + '"]');
+    if (thumbEl) thumbEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  };
+
+  window.prodShiftSlide = function(dir) { prodGotoSlide(currentIdx + dir); };
+
+  /* ── LIGHTBOX ── */
+  var lbEl  = document.getElementById('ProdLightbox');
+  var lbImg = document.getElementById('ProdLbImg');
+  var lbImages = [];
+  document.querySelectorAll('.prod-media-slide[data-media-type="image"] img').forEach(function(img) {
+    lbImages.push(img.src);
+  });
+
+  window.prodOpenLightbox = function(idx) {
+    if (!lbEl || lbImages.length === 0) return;
+    currentIdx = idx;
+    lbImg.src = lbImages[idx] || '';
+    lbEl.classList.add('prod-lightbox--open');
+    document.body.style.overflow = 'hidden';
+  };
+  window.prodCloseLightbox = function() {
+    if (!lbEl) return;
+    lbEl.classList.remove('prod-lightbox--open');
+    document.body.style.overflow = '';
+  };
+  window.prodLbShift = function(dir) {
+    var next = (currentIdx + dir + lbImages.length) % lbImages.length;
+    lbImg.src = lbImages[next];
+    currentIdx = next;
+  };
+  lbEl && lbEl.addEventListener('click', function(e) { if (e.target === lbEl) prodCloseLightbox(); });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') prodCloseLightbox();
+    if (lbEl && lbEl.classList.contains('prod-lightbox--open')) {
+      if (e.key === 'ArrowLeft') prodLbShift(-1);
+      if (e.key === 'ArrowRight') prodLbShift(1);
+    }
+  });
+
+  /* ── QUANTITY ── */
+  var qtyInput  = document.getElementById('ProdQtyInput');
+  var formQtyEl = document.getElementById('ProdFormQty');
+
+  window.prodQty = function(delta) {
+    var val = Math.max(1, Math.min(99, (parseInt(qtyInput.value) || 1) + delta));
+    qtyInput.value = val;
+    if (formQtyEl) formQtyEl.value = val;
+  };
+  window.prodSyncQty = function(val) {
+    var n = Math.max(1, Math.min(99, parseInt(val) || 1));
+    qtyInput.value = n;
+    if (formQtyEl) formQtyEl.value = n;
+  };
+  qtyInput && qtyInput.addEventListener('change', function() { prodSyncQty(this.value); });
+
+  /* ── VARIANT SELECTION ── */
+  window.prodSelectOption = function(btn, optName, optVal) {
+    /* Update selectedOpts */
+    var idx = {{ product.options | map: 'downcase' | json }}.map(function(o) { return o; });
+    var pos = null;
+    {%- for option in product.options_with_values -%}
+      if ('{{ option.name }}' === optName) pos = {{ option.position }};
+    {%- endfor -%}
+    if (pos !== null) selectedOpts[pos] = optVal;
+
+    /* Update active button states in the group */
+    btn.closest('[role="radiogroup"]').querySelectorAll('[data-option]').forEach(function(b) {
+      b.classList.remove('prod-size-btn--active', 'prod-pill--active', 'prod-color-swatch--active');
+    });
+    btn.classList.add(
+      btn.classList.contains('prod-color-swatch') ? 'prod-color-swatch--active' :
+      btn.classList.contains('prod-size-btn')     ? 'prod-size-btn--active'     :
+      'prod-pill--active'
+    );
+
+    /* Update display label */
+    var lbl = document.getElementById('selected-' + optName.toLowerCase().replace(/\s+/g, '-'));
+    if (lbl) lbl.textContent = optVal;
+
+    /* Find matching variant */
+    var matched = null;
+    for (var v = 0; v < variants.length; v++) {
+      var vnt = variants[v];
+      var match = true;
+      for (var p = 1; p <= {{ product.options.size }}; p++) {
+        if (selectedOpts[p] !== undefined && vnt.options[p - 1] !== selectedOpts[p]) {
+          match = false; break;
+        }
+      }
+      if (match) { matched = vnt; break; }
+    }
+
+    if (!matched) return;
+
+    /* Update URL without reload */
+    var url = new URL(window.location.href);
+    url.searchParams.set('variant', matched.id);
+    window.history.replaceState({}, '', url);
+
+    /* Update hidden variant ID */
+    var vidInput = document.getElementById('ProdVariantId');
+    if (vidInput) vidInput.value = matched.id;
+
+    /* Update price */
+    updatePrice(matched);
+
+    /* Update SKU */
+    var skuEl = document.getElementById('ProdSku');
+    if (skuEl && matched.sku) skuEl.textContent = matched.sku;
+
+    /* Update ATC button */
+    var addBtn   = document.getElementById('ProdAddBtn');
+    var addLabel = document.getElementById('ProdAddLabel');
+    if (addBtn && addLabel) {
+      var avail = matched.available;
+      addBtn.disabled = !avail;
+      addBtn.classList.toggle('prod-add-btn--disabled', !avail);
+      addBtn.setAttribute('aria-disabled', !avail);
+      addLabel.textContent = avail ? 'Add to Cart' : 'Sold Out';
+    }
+
+    /* Update availability */
+    var availEl = document.getElementById('ProdAvailability');
+    if (availEl) {
+      availEl.innerHTML = matched.available
+        ? '<span class="prod-availability-dot prod-availability-dot--in"></span><span class="prod-availability-text">In stock</span>'
+        : '<span class="prod-availability-dot prod-availability-dot--out"></span><span class="prod-availability-text prod-availability-text--out">Sold out</span>';
+    }
+
+    /* Jump gallery to variant image */
+    if (mediaByVariant[matched.id] !== undefined) {
+      prodGotoSlide(mediaByVariant[matched.id]);
+    }
+  };
+
+  function formatMoney(cents) {
+    var symbol = document.documentElement.dataset.currencySymbol || '{{ cart.currency.symbol | escape }}';
+    var locale  = document.documentElement.dataset.currencyLocale  || '{{ request.locale.iso_code }}';
+    return symbol + (cents / 100).toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function updatePrice(variant) {
+    var block = document.getElementById('ProdPriceBlock');
+    if (!block) return;
+    var html = '';
+    if (variant.compare_at_price > variant.price) {
+      var pct = Math.round((variant.compare_at_price - variant.price) / variant.compare_at_price * 100);
+      html += '<span class="prod-price prod-price--sale">' + formatMoney(variant.price) + '</span>';
+      html += '<span class="prod-price prod-price--compare">' + formatMoney(variant.compare_at_price) + '</span>';
+      html += '<span class="prod-price-save">Save ' + pct + '%</span>';
+    } else {
+      html += '<span class="prod-price">' + formatMoney(variant.price) + '</span>';
+    }
+    block.innerHTML = html;
+  }
+
+  /* ── ATC (AJAX) ── */
+  var prodForm = document.getElementById('{{ product_form_id }}');
+  if (prodForm) {
+    prodForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      var addBtn   = document.getElementById('ProdAddBtn');
+      var addIcon  = document.getElementById('ProdAddIcon');
+      var addLabel = document.getElementById('ProdAddLabel');
+      if (!addBtn || addBtn.disabled) return;
+
+      addBtn.disabled = true;
+      if (addIcon) addIcon.outerHTML = '<svg id="ProdAddIcon" class="prod-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>';
+      if (addLabel) addLabel.textContent = 'Adding…';
+
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+        body: JSON.stringify({
+          id: document.getElementById('ProdVariantId').value,
+          quantity: parseInt(qtyInput && qtyInput.value || 1)
+        })
+      })
+      .then(function(r) { if (!r.ok) return r.json().then(function(d) { throw new Error(d.description || 'Error'); }); return r.json(); })
+      .then(function() {
+        if (addLabel) addLabel.textContent = '✓ Added to Cart!';
+        showToast('✓ {{ product.title | escape | replace: "'", "\'" }} added to cart.');
+        return fetch('/cart.js');
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(cart) {
+        var ct = document.querySelector('.cart-count');
+        if (ct) ct.textContent = cart.item_count;
+        // Open drawer and refresh its contents
+        if (typeof window.relicaOpenDrawer === 'function') {
+          window.relicaOpenDrawer();
+        }
+        setTimeout(function() {
+          var iconEl = document.getElementById('ProdAddIcon');
+          if (iconEl) iconEl.classList.remove('prod-spin');
+          if (addLabel) addLabel.textContent = 'Add to Cart';
+          addBtn.disabled = false;
+        }, 2200);
+      })
+      .catch(function(err) {
+        var iconEl = document.getElementById('ProdAddIcon');
+        if (iconEl) iconEl.classList.remove('prod-spin');
+        if (addLabel) addLabel.textContent = 'Add to Cart';
+        addBtn.disabled = false;
+        showToast((err && err.message) || 'Could not add to cart.', 'error');
+      });
+    });
+  }
+
+  /* ── BUY NOW ── */
+  window.prodBuyNow = function() {
+    var vid = document.getElementById('ProdVariantId');
+    var qty = qtyInput && qtyInput.value || 1;
+    if (!vid) return;
+    window.location.href = '/cart/' + vid.value + ':' + qty + '?checkout';
+  };
+
+  /* ── TABS ── */
+  window.prodOpenTab = function(id) {
+    document.querySelectorAll('.prod-tab').forEach(function(t) {
+      var active = t.dataset.tab === id;
+      t.classList.toggle('active', active);
+      t.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+    document.querySelectorAll('.prod-tab-panel').forEach(function(p) {
+      p.style.display = p.id === 'tabpanel-' + id ? '' : 'none';
+    });
+  };
+
+  /* ── WISHLIST ── */
+  function getWL() { try { return JSON.parse(localStorage.getItem('relicaWL') || '[]'); } catch(e) { return []; } }
+  function saveWL(l) { try { localStorage.setItem('relicaWL', JSON.stringify(l)); } catch(e) {} }
+
+  window.prodToggleWishlist = function(btn, pid) {
+    var l = getWL(), idx = l.indexOf(pid);
+    if (idx === -1) { l.push(pid); showToast('♡ Saved to wishlist'); }
+    else { l.splice(idx, 1); showToast('Removed from wishlist'); }
+    saveWL(l);
+    btn.classList.toggle('prod-sec-btn--active', l.indexOf(pid) !== -1);
+  };
+
+  /* Restore wishlist state */
+  var wl = getWL();
+  var wlBtn = document.getElementById('WishlistBtn');
+  if (wlBtn && wl.indexOf('{{ product.id | json }}') !== -1) wlBtn.classList.add('prod-sec-btn--active');
+
+  /* ── SHARE ── */
+  window.prodShare = function() {
+    if (navigator.share) {
+      navigator.share({ title: '{{ product.title | escape }}', url: window.location.href }).catch(function() {});
+    } else {
+      navigator.clipboard && navigator.clipboard.writeText(window.location.href).then(function() { showToast('Link copied!'); });
+    }
+  };
+
+  /* ── TOAST ── */
+  var toastEl = document.getElementById('ProdToast'), toastT;
+  function showToast(msg, type) {
+    if (!toastEl) return;
+    toastEl.textContent = msg;
+    toastEl.className = 'relica-toast relica-toast--show' + (type === 'error' ? ' relica-toast--error' : '');
+    clearTimeout(toastT);
+    toastT = setTimeout(function() { toastEl.className = 'relica-toast'; }, 3200);
+  }
+
+  /* ── TOUCH SWIPE ── */
+  var viewer = document.getElementById('ProdViewer');
+  if (viewer) {
+    var touchStartX = 0;
+    viewer.addEventListener('touchstart', function(e) { touchStartX = e.changedTouches[0].clientX; }, { passive: true });
+    viewer.addEventListener('touchend', function(e) {
+      var diff = touchStartX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 40) prodShiftSlide(diff > 0 ? 1 : -1);
+    }, { passive: true });
+  }
+
+  /* ── REVEAL ── */
+  if ('IntersectionObserver' in window) {
+    var ro = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) { if (e.isIntersecting) { e.target.classList.add('visible'); ro.unobserve(e.target); } });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(function(el) { ro.observe(el); });
+  } else {
+    document.querySelectorAll('.reveal').forEach(function(el) { el.classList.add('visible'); });
+  }
+
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Product Page",
+  "tag": "div",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Trust Bar"
+    },
+    { "type": "text", "id": "trust1", "label": "Trust item 1", "default": "Up to 5-Year Warranty" },
+    { "type": "text", "id": "trust2", "label": "Trust item 2", "default": "ISI Certified · PFOA Free" },
+    { "type": "text", "id": "trust3", "label": "Trust item 3", "default": "Free Delivery Above ₹999" },
+    { "type": "text", "id": "trust4", "label": "Trust item 4", "default": "Made for Indian Kitchens" },
+    {
+      "type": "header",
+      "content": "Display Options"
+    },
+    { "type": "checkbox", "id": "show_sku", "label": "Show SKU", "default": true },
+    { "type": "checkbox", "id": "show_buy_now", "label": "Show Buy Now button", "default": true },
+    { "type": "checkbox", "id": "show_specs", "label": "Show Specifications tab", "default": true },
+    { "type": "checkbox", "id": "show_compat", "label": "Show Compatibility tab", "default": true },
+    { "type": "checkbox", "id": "show_shipping", "label": "Show Shipping & Returns tab", "default": true },
+    { "type": "checkbox", "id": "show_reviews", "label": "Show Reviews tab", "default": true },
+    {
+      "type": "header",
+      "content": "Compatibility Tab"
+    },
+    {
+      "type": "textarea",
+      "id": "compat_intro",
+      "label": "Intro text",
+      "default": "This cookware is engineered for universal cooktop compatibility — works seamlessly on all cooktop types."
+    },
+    {
+      "type": "header",
+      "content": "Shipping & Returns Tab"
+    },
+    {
+      "type": "richtext",
+      "id": "shipping_text",
+      "label": "Shipping & Returns content (leave blank to use default)"
+    },
+    {
+      "type": "header",
+      "content": "Related Products"
+    },
+    { "type": "checkbox", "id": "show_related", "label": "Show related products", "default": true },
+    { "type": "text", "id": "related_eyebrow", "label": "Eyebrow text", "default": "From the Same Series" },
+    { "type": "text", "id": "related_title_plain", "label": "Heading — plain", "default": "You May Also" },
+    { "type": "text", "id": "related_title_italic", "label": "Heading — italic", "default": "Like" }
+  ],
+  "blocks": [
+    {
+      "type": "spec_row",
+      "name": "Specification Row",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Label", "default": "Material" },
+        { "type": "text", "id": "value", "label": "Value", "default": "Die-Cast Aluminium" }
+      ]
+    }
+  ],
+  "enabled_on": {
+    "templates": ["product"]
+  }
+}
+{% endschema %}

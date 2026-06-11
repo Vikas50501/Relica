@@ -1,0 +1,738 @@
+{{ 'section-collections-grid.css' | asset_url | stylesheet_tag }}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+
+<style>
+  #CollectionsGrid-{{ section.id }} {
+    --cg-bg: {{ section.settings.section_bg }};
+    --cg-eyebrow: {{ section.settings.eyebrow_color }};
+    --cg-title: {{ section.settings.title_color }};
+    --cg-card-text: {{ section.settings.card_text_color }};
+    --cg-overlay-from: {{ section.settings.overlay_color }};
+    --cg-overlay-opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }};
+    --cg-pt: {{ section.settings.padding_top }}px;
+    --cg-pb: {{ section.settings.padding_bottom }}px;
+    --cg-radius: {{ section.settings.card_radius }}px;
+    --cg-gap: {{ section.settings.grid_gap }}px;
+    --cg-row-height: {{ section.settings.row_height }}px;
+  }
+
+  .collections-section-{{ section.id }} {
+    background: var(--cg-bg);
+    padding: var(--cg-pt) 40px var(--cg-pb);
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .cg-inner-{{ section.id }} {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+  }
+
+  .cg-header-{{ section.id }} {
+    margin-bottom: {{ section.settings.header_spacing }}px;
+    text-align: {{ section.settings.header_align }};
+  }
+
+  .cg-eyebrow-{{ section.id }} {
+    font-size: 11px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--cg-eyebrow);
+    font-weight: 500;
+    margin: 0 0 12px;
+  }
+
+  .cg-title-{{ section.id }} {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(32px, 3vw, 46px);
+    font-weight: 300;
+    color: var(--cg-title);
+    line-height: 1.15;
+    margin: 0;
+  }
+
+  .cg-title-{{ section.id }} em {
+    font-style: italic;
+  }
+
+  .cg-grid-{{ section.id }} {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: var(--cg-row-height);
+    gap: var(--cg-gap);
+  }
+
+  {%- if section.settings.feature_first_card -%}
+  .cg-grid-{{ section.id }} .col-card:first-child {
+    grid-row: span 2;
+  }
+  .cg-grid-{{ section.id }} .col-card:first-child .col-name {
+    font-size: clamp(28px, 3vw, 42px);
+  }
+  {%- endif -%}
+
+  .col-card {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    border-radius: var(--cg-radius);
+    display: block;
+    text-decoration: none;
+    min-height: var(--cg-row-height);
+  }
+
+  .col-card .col-bg-inner {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    transition: transform .7s cubic-bezier(.25,.46,.45,.94);
+    overflow: hidden;
+  }
+
+  .col-card:hover .col-bg-inner {
+    transform: scale(1.06);
+  }
+
+  .col-card .col-bg-inner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Overlay sits above the image, below the text */
+  .col-card .col-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .col-card .col-content {
+    position: absolute;
+    bottom: {{ section.settings.content_padding }}px;
+    left: {{ section.settings.content_padding }}px;
+    right: {{ section.settings.content_padding }}px;
+    color: var(--cg-card-text);
+    z-index: 2;
+  }
+
+  /* Content area background */
+  .col-card .col-content--bg {
+    border-radius: 6px;
+    padding: 18px 20px;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+  }
+
+  .col-card .col-eyebrow {
+    font-size: 10px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.65);
+    margin: 0 0 6px;
+    font-weight: 400;
+  }
+
+  .col-card .col-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(22px, 2vw, 28px);
+    font-weight: 400;
+    color: #fff;
+    margin: 0 0 14px;
+    line-height: 1.15;
+  }
+
+  .col-card .col-desc {
+    font-size: 13px;
+    color: rgba(255,255,255,.72);
+    line-height: 1.6;
+    margin: 0 0 14px;
+    font-weight: 300;
+    max-width: 90%;
+  }
+
+  .col-card .col-link {
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.8);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255,255,255,.35);
+    padding-bottom: 3px;
+    transition: all .25s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 400;
+  }
+
+  .col-card .col-link .arrow {
+    display: inline-block;
+    transition: transform .25s ease;
+  }
+
+  .col-card:hover .col-link {
+    color: #fff;
+    border-color: #fff;
+  }
+
+  .col-card:hover .col-link .arrow {
+    transform: translateX(4px);
+  }
+
+  /* Reveal animations */
+  .reveal,
+  .reveal-left,
+  .reveal-right {
+    opacity: 0;
+    transition: opacity .7s ease, transform .7s ease;
+  }
+
+  .reveal { transform: translateY(32px); }
+  .reveal-left { transform: translateX(-32px); }
+  .reveal-right { transform: translateX(32px); }
+
+  .reveal.visible,
+  .reveal-left.visible,
+  .reveal-right.visible {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+
+  .reveal-delay-1 { transition-delay: .1s; }
+  .reveal-delay-2 { transition-delay: .2s; }
+  .reveal-delay-3 { transition-delay: .3s; }
+  .reveal-delay-4 { transition-delay: .4s; }
+  .reveal-delay-5 { transition-delay: .4s; }
+
+  /* Responsive */
+  @media (max-width: 990px) {
+    .collections-section-{{ section.id }} {
+      padding: {{ section.settings.padding_top | times: 0.7 | round }}px 24px {{ section.settings.padding_bottom | times: 0.7 | round }}px;
+    }
+  }
+
+  @media (max-width: 749px) {
+    .cg-grid-{{ section.id }} {
+      grid-template-columns: 1fr;
+      grid-auto-rows: minmax(280px, auto);
+    }
+    {%- if section.settings.feature_first_card -%}
+    .cg-grid-{{ section.id }} .col-card:first-child {
+      grid-row: span 1;
+    }
+    {%- endif -%}
+    .col-card .col-content {
+      bottom: 24px;
+      left: 24px;
+      right: 24px;
+    }
+    .cg-header-{{ section.id }} {
+      text-align: left;
+    }
+  }
+  .col-card .col-content {
+  transition: opacity .4s ease;
+}
+
+.col-card:hover .col-content {
+  opacity: 0;
+}
+</style>
+
+<section
+  id="CollectionsGrid-{{ section.id }}"
+  class="collections-section-{{ section.id }}"
+>
+  <div class="cg-inner-{{ section.id }}">
+    {%- if section.settings.eyebrow != blank or section.settings.title_plain != blank or section.settings.title_italic != blank -%}
+      <div class="cg-header-{{ section.id }} reveal">
+        {%- if section.settings.eyebrow != blank -%}
+          <p class="cg-eyebrow-{{ section.id }}">{{ section.settings.eyebrow }}</p>
+        {%- endif -%}
+        {%- if section.settings.title_plain != blank or section.settings.title_italic != blank -%}
+          <h2 class="cg-title-{{ section.id }}">
+            {{ section.settings.title_plain }}
+            {%- if section.settings.title_italic != blank %} <em>{{ section.settings.title_italic }}</em>{% endif -%}
+          </h2>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <div class="cg-grid-{{ section.id }}">
+      {%- for block in section.blocks -%}
+        {%- assign link = block.settings.link_url | default: '#' -%}
+
+        {%- comment -%}
+          Resolve overlay color: use block-level override if enabled, otherwise fall back to section default.
+        {%- endcomment -%}
+        {%- if block.settings.use_card_overlay -%}
+          {%- assign overlay_r = block.settings.card_overlay_color | color_extract: 'red' -%}
+          {%- assign overlay_g = block.settings.card_overlay_color | color_extract: 'green' -%}
+          {%- assign overlay_b = block.settings.card_overlay_color | color_extract: 'blue' -%}
+          {%- assign overlay_op = block.settings.card_overlay_opacity | divided_by: 100.0 -%}
+        {%- else -%}
+          {%- assign overlay_r = section.settings.overlay_color | color_extract: 'red' -%}
+          {%- assign overlay_g = section.settings.overlay_color | color_extract: 'green' -%}
+          {%- assign overlay_b = section.settings.overlay_color | color_extract: 'blue' -%}
+          {%- assign overlay_op = section.settings.overlay_opacity | divided_by: 100.0 -%}
+        {%- endif -%}
+
+        <a
+          href="{{ link }}"
+          class="col-card {% if forloop.first %}reveal-left{% else %}reveal-right reveal-delay-{{ forloop.index }}{% endif %}"
+          {{ block.shopify_attributes }}
+          aria-label="{{ block.settings.name | escape }}"
+        >
+          <div
+            class="col-bg-inner"
+            {%- if block.settings.image == blank -%}
+              style="background: {% if block.settings.gradient != blank %}{{ block.settings.gradient }}{% else %}{{ block.settings.fallback_color }}{% endif %}; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;"
+            {%- endif -%}
+          >
+            {%- if block.settings.image != blank -%}
+              {{ block.settings.image | image_url: width: 1400 | image_tag:
+                  loading: 'lazy',
+                  widths: '400, 600, 800, 1000, 1200, 1400',
+                  sizes: '(min-width: 750px) 50vw, 100vw',
+                  alt: block.settings.name
+              }}
+            {%- else -%}
+              <span style="font-family: 'Cormorant Garamond', serif; font-size: 15px; color: rgba(255,255,255,.15); text-align: center; padding: 20px;">
+                {{ block.settings.name }} · Product Image
+              </span>
+            {%- endif -%}
+          </div>
+
+          {%- comment -%}
+            Per-card overlay rendered inline so each card can have its own color & opacity.
+          {%- endcomment -%}
+          <div
+            class="col-overlay"
+            style="background: linear-gradient(
+              to top,
+              rgba({{ overlay_r }},{{ overlay_g }},{{ overlay_b }}, {{ overlay_op }}) 0%,
+              rgba({{ overlay_r }},{{ overlay_g }},{{ overlay_b }}, 0.08) 55%,
+              transparent 100%
+            );"
+          ></div>
+
+          {%- assign cb_r = block.settings.content_bg_color | color_extract: 'red' -%}
+          {%- assign cb_g = block.settings.content_bg_color | color_extract: 'green' -%}
+          {%- assign cb_b = block.settings.content_bg_color | color_extract: 'blue' -%}
+          {%- assign cb_op = block.settings.content_bg_opacity | divided_by: 100.0 -%}
+
+          <div
+            class="col-content{% if block.settings.content_bg_opacity > 0 %} col-content--bg{% endif %}"
+            style="background: rgba({{ cb_r }},{{ cb_g }},{{ cb_b }},{{ cb_op }});"
+          >
+            {%- if block.settings.eyebrow != blank -%}
+              <p class="col-eyebrow">{{ block.settings.eyebrow }}</p>
+            {%- endif -%}
+            {%- if block.settings.name != blank -%}
+              <h3 class="col-name">{{ block.settings.name }}</h3>
+            {%- endif -%}
+            {%- if block.settings.description != blank -%}
+              <p class="col-desc">{{ block.settings.description }}</p>
+            {%- endif -%}
+            {%- if block.settings.link_label != blank -%}
+              <span class="col-link">
+                {{ block.settings.link_label }}
+                <span class="arrow">→</span>
+              </span>
+            {%- endif -%}
+          </div>
+        </a>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+<script>
+  (function() {
+    const section = document.getElementById('CollectionsGrid-{{ section.id }}');
+    if (!section) return;
+
+    const elements = section.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+
+      elements.forEach(function(el) { observer.observe(el); });
+    } else {
+      elements.forEach(function(el) { el.classList.add('visible'); });
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Collections Grid",
+  "tag": "section",
+  "class": "section-collections-grid",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Heading"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow label",
+      "default": "Our Range"
+    },
+    {
+      "type": "text",
+      "id": "title_plain",
+      "label": "Title — plain text",
+      "default": "Explore Our"
+    },
+    {
+      "type": "text",
+      "id": "title_italic",
+      "label": "Title — italic accent",
+      "default": "Series"
+    },
+    {
+      "type": "select",
+      "id": "header_align",
+      "label": "Heading alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "header_spacing",
+      "label": "Space below heading",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    },
+
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "checkbox",
+      "id": "feature_first_card",
+      "label": "Feature first card (double height)",
+      "info": "Makes the first card span two rows like the hero pattern.",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "row_height",
+      "label": "Row height",
+      "min": 220,
+      "max": 500,
+      "step": 10,
+      "unit": "px",
+      "default": 320
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "label": "Gap between cards",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "Card corner radius",
+      "min": 0,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "content_padding",
+      "label": "Card text inset",
+      "min": 16,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Max content width",
+      "min": 1000,
+      "max": 1600,
+      "step": 20,
+      "unit": "px",
+      "default": 1320
+    },
+
+    {
+      "type": "header",
+      "content": "Default Overlay"
+    },
+    {
+      "type": "color",
+      "id": "section_bg",
+      "label": "Section background",
+      "default": "#FDFAF6"
+    },
+    {
+      "type": "color",
+      "id": "eyebrow_color",
+      "label": "Eyebrow color",
+      "default": "#C4827A"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title color",
+      "default": "#0F1F33"
+    },
+    {
+      "type": "color",
+      "id": "card_text_color",
+      "label": "Card text color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Default card overlay color",
+      "default": "#0F1F33"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Default overlay darkness",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 70
+    },
+
+    {
+      "type": "header",
+      "content": "Section Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    }
+  ],
+
+  "blocks": [
+    {
+      "type": "collection_card",
+      "name": "Collection Card",
+      "limit": 5,
+      "settings": [
+        {
+          "type": "header",
+          "content": "Card Content"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Collection image",
+          "info": "Recommended: 1400 × 900 px"
+        },
+        {
+          "type": "text",
+          "id": "eyebrow",
+          "label": "Eyebrow label",
+          "default": "Premium Nonstick"
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Collection name",
+          "default": "Die-Cast Series"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Short description",
+          "info": "Optional — appears above the link"
+        },
+        {
+          "type": "text",
+          "id": "link_label",
+          "label": "Link text",
+          "default": "Shop Collection"
+        },
+        {
+          "type": "url",
+          "id": "link_url",
+          "label": "Link URL"
+        },
+
+        {
+          "type": "header",
+          "content": "Card Overlay"
+        },
+        {
+          "type": "checkbox",
+          "id": "use_card_overlay",
+          "label": "Override section overlay for this card",
+          "info": "Enable to set a custom overlay color and opacity just for this card.",
+          "default": false
+        },
+        {
+          "type": "color",
+          "id": "card_overlay_color",
+          "label": "Card overlay color",
+          "info": "Only used when override is enabled.",
+          "default": "#0F1F33"
+        },
+        {
+          "type": "range",
+          "id": "card_overlay_opacity",
+          "label": "Card overlay darkness",
+          "info": "Only used when override is enabled.",
+          "min": 0,
+          "max": 100,
+          "step": 5,
+          "unit": "%",
+          "default": 70
+        },
+
+        {
+          "type": "header",
+          "content": "Content Area Background"
+        },
+        {
+          "type": "color",
+          "id": "content_bg_color",
+          "label": "Content background color",
+          "info": "Adds a tinted background behind the text block. Set opacity to 0 to disable.",
+          "default": "#000000"
+        },
+        {
+          "type": "range",
+          "id": "content_bg_opacity",
+          "label": "Content background opacity",
+          "min": 0,
+          "max": 100,
+          "step": 5,
+          "unit": "%",
+          "default": 0
+        },
+
+        {
+          "type": "header",
+          "content": "Fallback (when no image)"
+        },
+        {
+          "type": "color",
+          "id": "fallback_color",
+          "label": "Fallback background",
+          "default": "#2A4A74"
+        },
+        {
+          "type": "color_background",
+          "id": "gradient",
+          "label": "Fallback gradient",
+          "info": "Overrides solid color if set.",
+          "default": "linear-gradient(160deg, #2A4A74, #0F1F33)"
+        }
+      ]
+    }
+  ],
+
+  "max_blocks": 5,
+
+  "presets": [
+    {
+      "name": "Collections Grid",
+      "blocks": [
+        {
+          "type": "collection_card",
+          "settings": {
+            "eyebrow": "Premium Nonstick",
+            "name": "Die-Cast Series",
+            "description": "Refined design and uncompromising performance with a 4mm die-cast body.",
+            "link_label": "Shop Collection",
+            "fallback_color": "#2A4A74",
+            "gradient": "linear-gradient(160deg, #2A4A74, #0F1F33)",
+            "use_card_overlay": false,
+            "card_overlay_color": "#0F1F33",
+            "card_overlay_opacity": 70,
+            "content_bg_color": "#000000",
+            "content_bg_opacity": 0
+          }
+        },
+        {
+          "type": "collection_card",
+          "settings": {
+            "eyebrow": "Stainless Steel",
+            "name": "Triply Series",
+            "description": "Three-layer architecture with food-grade SS304 and a sleek mirror finish.",
+            "link_label": "Shop Collection",
+            "fallback_color": "#6B7C5E",
+            "gradient": "linear-gradient(135deg, #6B7C5E, #3d4a35)",
+            "use_card_overlay": false,
+            "card_overlay_color": "#0F1F33",
+            "card_overlay_opacity": 70,
+            "content_bg_color": "#000000",
+            "content_bg_opacity": 0
+          }
+        },
+        {
+          "type": "collection_card",
+          "settings": {
+            "eyebrow": "Hybrid Technology",
+            "name": "Honeycomb Series",
+            "description": "Stainless–nonstick fusion for even cooking and effortless release.",
+            "link_label": "Shop Collection",
+            "fallback_color": "#C4827A",
+            "gradient": "linear-gradient(135deg, #C4827A, #8B4A44)",
+            "use_card_overlay": false,
+            "card_overlay_color": "#0F1F33",
+            "card_overlay_opacity": 70,
+            "content_bg_color": "#000000",
+            "content_bg_opacity": 0
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

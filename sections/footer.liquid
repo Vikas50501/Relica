@@ -1,0 +1,100 @@
+<footer style="background:{{ settings.footer_bg | default: '#0F1F33' }};color:{{ settings.footer_text | default: '#FFFFFF' }};">
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <a href="{{ routes.root_url }}" class="footer-logo" style="color:{{ settings.footer_text | default: '#fff' }};">
+          {%- if section.settings.logo_image != blank -%}
+            <img src="{{ section.settings.logo_image | image_url: width: 200 }}" alt="{{ shop.name }}" style="height:{{ section.settings.logo_height }}px;width:auto;">
+          {%- else -%}
+            {{ section.settings.logo_text1 }}<em>{{ section.settings.logo_text2 }}</em>
+          {%- endif -%}
+        </a>
+        <p class="footer-tagline">{{ section.settings.tagline }}</p>
+        {%- if section.settings.address != blank -%}<p class="footer-contact">{{ section.settings.address }}</p>{%- endif -%}
+        {%- if section.settings.phone != blank -%}<p class="footer-contact">{{ section.settings.phone }}</p>{%- endif -%}
+        {%- if section.settings.email != blank -%}<p class="footer-contact">{{ section.settings.email }}</p>{%- endif -%}
+
+        {%- if settings.footer_show_social -%}
+          <div class="footer-social">
+            {%- if settings.footer_instagram != blank -%}
+              <a href="{{ settings.footer_instagram }}" aria-label="Instagram" target="_blank" rel="noopener">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+              </a>
+            {%- endif -%}
+            {%- if settings.footer_facebook != blank -%}
+              <a href="{{ settings.footer_facebook }}" aria-label="Facebook" target="_blank" rel="noopener">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+              </a>
+            {%- endif -%}
+            {%- if settings.footer_youtube != blank -%}
+              <a href="{{ settings.footer_youtube }}" aria-label="YouTube" target="_blank" rel="noopener">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.95C5.12 20 12 20 12 20s6.88 0 8.59-.47a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>
+              </a>
+            {%- endif -%}
+            {%- if settings.footer_twitter != blank -%}
+              <a href="{{ settings.footer_twitter }}" aria-label="Twitter / X" target="_blank" rel="noopener">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4l16 16M4 20L20 4"/></svg>
+              </a>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      </div>
+
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'nav_column' -%}
+          <div {{ block.shopify_attributes }}>
+            <h4 class="footer-col-title">{{ block.settings.title }}</h4>
+            <ul class="footer-links">
+              {%- for link in linklists[block.settings.menu].links -%}
+                <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+              {%- endfor -%}
+            </ul>
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+    <div class="footer-bottom">
+      <span>{{ section.settings.copyright }}</span>
+      <div class="footer-legal">
+        {%- if section.settings.privacy_url != blank -%}<a href="{{ section.settings.privacy_url }}">Privacy Policy</a>{%- endif -%}
+        {%- if section.settings.terms_url != blank -%}<a href="{{ section.settings.terms_url }}">Terms of Service</a>{%- endif -%}
+        {%- if section.settings.sitemap_url != blank -%}<a href="{{ section.settings.sitemap_url }}">Sitemap</a>{%- endif -%}
+      </div>
+    </div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "settings": [
+    { "type": "header", "content": "Logo" },
+    { "type": "image_picker", "id": "logo_image", "label": "Logo image" },
+    { "type": "range", "id": "logo_height", "label": "Logo height (px)", "min": 20, "max": 80, "step": 2, "default": 36 },
+    { "type": "text", "id": "logo_text1", "label": "Logo text — part 1", "default": "Relic" },
+    { "type": "text", "id": "logo_text2", "label": "Logo text — italic part", "default": "a" },
+    { "type": "header", "content": "Brand Info" },
+    { "type": "textarea", "id": "tagline", "label": "Tagline" },
+    { "type": "text", "id": "address", "label": "Address" },
+    { "type": "text", "id": "phone", "label": "Phone" },
+    { "type": "text", "id": "email", "label": "Email" },
+    { "type": "header", "content": "Legal" },
+    { "type": "text", "id": "copyright", "label": "Copyright text", "default": "© 2026 Relica Innovations Pvt. Ltd. All rights reserved." },
+    { "type": "url", "id": "privacy_url", "label": "Privacy Policy URL" },
+    { "type": "url", "id": "terms_url", "label": "Terms of Service URL" },
+    { "type": "url", "id": "sitemap_url", "label": "Sitemap URL" }
+  ],
+  "blocks": [
+    {
+      "type": "nav_column",
+      "name": "Footer Column",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Column title", "default": "Shop Now" },
+        { "type": "link_list", "id": "menu", "label": "Menu" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Footer" }]
+}
+{% endschema %}

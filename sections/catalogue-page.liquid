@@ -1,0 +1,27 @@
+<section class="catalogue-section">
+  <div class="section-inner">
+    <div class="catalogue-download">
+      <h2 class="section-title">{{ section.settings.download_heading }}</h2>
+      <p class="catalogue-body">{{ section.settings.download_body }}</p>
+      {%- if section.settings.download_file_url != blank -%}
+        <a href="{{ section.settings.download_file_url }}" class="btn-primary" download>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="vertical-align:middle;margin-right:8px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          {{ section.settings.download_btn_label }}
+        </a>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Catalogue Page",
+  "settings": [
+    { "type": "text", "id": "download_heading", "label": "Heading", "default": "Download Our Catalogue" },
+    { "type": "textarea", "id": "download_body", "label": "Description" },
+    { "type": "text", "id": "download_btn_label", "label": "Button label", "default": "Download PDF" },
+    { "type": "text", "id": "download_file_url", "label": "File URL (upload to Files in Shopify admin)" }
+  ],
+  "presets": [{ "name": "Catalogue Page" }]
+}
+{% endschema %}

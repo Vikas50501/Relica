@@ -1,0 +1,728 @@
+<section class="hero"
+  id="hero"
+  role="region"
+  aria-label="Hero slideshow"
+  aria-roledescription="carousel">
+
+  {%- if section.settings.autoplay -%}
+    <div class="hero-progress" aria-hidden="true">
+      <div class="hero-progress-bar" id="heroProgressBar"></div>
+    </div>
+  {%- endif -%}
+
+  <div class="hero-slides"
+    id="heroSlides"
+    data-speed="{{ section.settings.autoplay_speed | times: 1000 }}"
+    data-autoplay="{{ section.settings.autoplay }}"
+    aria-live="polite">
+
+    {%- for block in section.blocks -%}
+      <div class="hero-slide {% if forloop.first %}active{% endif %}"
+        role="group"
+        aria-roledescription="slide"
+        aria-label="Slide {{ forloop.index }} of {{ section.blocks.size }}"
+        {{ block.shopify_attributes }}>
+
+        <div class="slide-bg">
+          {%- if block.settings.bg_image != blank -%}
+            <img
+              src="{{ block.settings.bg_image | image_url: width: 2000 }}"
+              alt="{{ block.settings.title_line1 }}"
+              loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+              width="2000"
+              height="1000">
+          {%- endif -%}
+          <div class="slide-bg-overlay"
+            style="background:{{ block.settings.overlay_color }};opacity:{{ block.settings.overlay_opacity | divided_by: 100.0 }};"></div>
+        </div>
+
+        <div class="slide-content">
+          {%- if block.settings.eyebrow != blank -%}
+            <p class="slide-eyebrow">{{ block.settings.eyebrow }}</p>
+          {%- endif -%}
+
+          <h1 class="slide-title">
+            {{ block.settings.title_line1 }}
+            {%- if block.settings.title_line2 != blank -%}
+              <br><em>{{ block.settings.title_line2 }}</em>
+            {%- endif -%}
+          </h1>
+
+          {%- if block.settings.subtitle != blank -%}
+            <p class="slide-sub">{{ block.settings.subtitle }}</p>
+          {%- endif -%}
+
+          <div class="slide-ctas">
+            {%- if block.settings.btn1_label != blank -%}
+              <a href="{{ block.settings.btn1_url }}" class="btn-primary">{{ block.settings.btn1_label }}</a>
+            {%- endif -%}
+            {%- if block.settings.btn2_label != blank -%}
+              <a href="{{ block.settings.btn2_url }}" class="btn-ghost">{{ block.settings.btn2_label }}</a>
+            {%- endif -%}
+          </div>
+        </div>
+
+        {%- assign has_product = false -%}
+        {%- if block.settings.product_image_1 != blank
+          or block.settings.product_image_2 != blank
+          or block.settings.product_image_3 != blank -%}
+          {%- assign has_product = true -%}
+        {%- endif -%}
+
+        {%- if has_product -%}
+          {%- comment -%} Count how many product images this slide has {%- endcomment -%}
+          {%- assign prod_count = 0 -%}
+          {%- if block.settings.product_image_1 != blank -%}{%- assign prod_count = prod_count | plus: 1 -%}{%- endif -%}
+          {%- if block.settings.product_image_2 != blank -%}{%- assign prod_count = prod_count | plus: 1 -%}{%- endif -%}
+          {%- if block.settings.product_image_3 != blank -%}{%- assign prod_count = prod_count | plus: 1 -%}{%- endif -%}
+
+          <div class="prod-slider" data-prod-slider aria-label="Product images">
+            <div class="prod-track" data-prod-track>
+
+              {%- if block.settings.product_image_1 != blank -%}
+                <div class="prod-item" data-state="active">
+                  <img
+                    src="{{ block.settings.product_image_1 | image_url: width: 600, height: 900, crop: 'center' }}"
+                    alt="{{ block.settings.product_label_1 | default: 'Product 1' }}"
+                    loading="lazy"
+                    width="600"
+                    height="900">
+                  {%- if block.settings.product_label_1 != blank -%}
+                    <span class="prod-label">{{ block.settings.product_label_1 }}</span>
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+
+              {%- if block.settings.product_image_2 != blank -%}
+                <div class="prod-item" data-state="enter-right">
+                  <img
+                    src="{{ block.settings.product_image_2 | image_url: width: 600, height: 900, crop: 'center' }}"
+                    alt="{{ block.settings.product_label_2 | default: 'Product 2' }}"
+                    loading="lazy"
+                    width="600"
+                    height="900">
+                  {%- if block.settings.product_label_2 != blank -%}
+                    <span class="prod-label">{{ block.settings.product_label_2 }}</span>
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+
+              {%- if block.settings.product_image_3 != blank -%}
+                <div class="prod-item" data-state="enter-right">
+                  <img
+                    src="{{ block.settings.product_image_3 | image_url: width: 600, height: 900, crop: 'center' }}"
+                    alt="{{ block.settings.product_label_3 | default: 'Product 3' }}"
+                    loading="lazy"
+                    width="600"
+                    height="900">
+                  {%- if block.settings.product_label_3 != blank -%}
+                    <span class="prod-label">{{ block.settings.product_label_3 }}</span>
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+
+            </div>
+
+            {%- comment -%} Only render dots when more than 1 product image {%- endcomment -%}
+            {%- if prod_count > 1 -%}
+              <div class="prod-dots" data-prod-dots></div>
+            {%- endif -%}
+
+          </div>
+        {%- endif -%}
+
+      </div>
+    {%- endfor -%}
+  </div>
+
+  {%- if section.blocks.size > 1 -%}
+    <div class="hero-numbers" id="heroNums" role="tablist" aria-label="Go to slide">
+      {%- for block in section.blocks -%}
+        <div class="hero-num {% if forloop.first %}active{% endif %}"
+          role="tab"
+          aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+          aria-label="Slide {{ forloop.index }}"
+          tabindex="0"
+          onclick="goSlide({{ forloop.index0 }})">
+          0{{ forloop.index }}
+        </div>
+      {%- endfor -%}
+    </div>
+
+    <div class="hero-arrows" role="group" aria-label="Slide navigation">
+      <button type="button" class="hero-arr hero-prev" aria-label="Previous slide">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+<button type="button" class="hero-arr hero-next" aria-label="Next slide">
+          <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+  {%- endif -%}
+
+</section>
+
+
+<style>
+/* ── Product slider wrapper ── */
+.prod-slider {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: clamp(260px, 28vw, 380px);
+  height: clamp(380px, 65vh, 580px);
+  transform: translateY(-50%) translateX(60px);
+  opacity: 0;
+  transition: opacity 0s, transform 0s;
+  z-index: 3;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  /* Position it centered in the right half */
+  margin-right: calc(25% - clamp(130px, 14vw, 190px));
+}
+
+.hero-slide.active .prod-slider {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+  transition: opacity 0.55s ease 0.3s, transform 0.6s cubic-bezier(0.22,1,0.36,1) 0.3s;
+  pointer-events: auto;
+}
+.hero-slide {
+  opacity: 0;
+  visibility: hidden;
+  position: absolute;
+  inset: 0;
+}
+
+.hero-slide.active {
+  opacity: 1;
+  visibility: visible;
+  position: relative;
+  z-index: 2;
+}
+
+/* ── Track ── */
+.prod-track {
+  width: 100%;
+  flex: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ── Product items — uses data-state instead of classes ── */
+.prod-item {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* default hidden */
+  opacity: 0;
+  transform: translateX(30px);
+  transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.22,1,0.36,1);
+}
+
+.prod-item[data-state="active"] {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.prod-item[data-state="enter-right"] {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.prod-item[data-state="enter-left"] {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+.prod-item[data-state="exit-left"] {
+  opacity: 0;
+  transform: translateX(-30px);
+  transition-duration: 0.35s;
+}
+
+.prod-item[data-state="exit-right"] {
+  opacity: 0;
+  transform: translateX(30px);
+  transition-duration: 0.35s;
+}
+
+.prod-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* FIX: was "contains" — invalid value */
+  object-position: center;
+  display: block;
+  transition: transform 0.5s cubic-bezier(0.22,1,0.36,1);
+}
+
+.prod-item:hover img {
+  transform: scale(1.08);
+}
+
+/* ── Label ── */
+.prod-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 28px 10px 10px;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(to top, rgba(0,0,0,0.55), transparent);
+  text-align: center;
+}
+
+/* ── Dots ── */
+.prod-dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+}
+
+.prod-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.35);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.prod-dot.active {
+  background: #fff;
+  transform: scale(1.35);
+}
+
+/* ── Progress bar ── */
+.hero-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: rgba(255,255,255,0.1);
+  z-index: 10;
+  overflow: hidden;
+}
+
+.hero-progress-bar {
+  height: 100%;
+  background: rgba(255,255,255,0.5);
+  width: 0%;
+  transition: width linear;
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .hero-slide,
+  .prod-item,
+  .hero-slide.active .prod-slider {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .prod-slider { display: none; }
+}
+</style>
+
+
+<script>
+(function () {
+  'use strict';
+
+  var slidesEl = document.getElementById('heroSlides');
+
+  if (!slidesEl) return;
+
+  var autoplay = slidesEl.dataset.autoplay === 'true';
+  var speed = parseInt(slidesEl.dataset.speed, 10) || 5000;
+  var prodSpeed = Math.round(speed * 0.55);
+
+  var slides = Array.from(document.querySelectorAll('.hero-slide'));
+  var nums = Array.from(document.querySelectorAll('.hero-num'));
+  var progressBar = document.getElementById('heroProgressBar');
+  var hero = document.getElementById('hero');
+
+  var current = 0;
+  var isPaused = false;
+  var autoTimer = null;
+
+  /* ───────────────── HERO SLIDER ───────────────── */
+
+  function goSlide(index) {
+
+  var prev = current;
+
+  current = ((index % slides.length) + slides.length) % slides.length;
+
+  slides.forEach(function(slide){
+    slide.classList.remove('active');
+  });
+
+  nums.forEach(function(num){
+    num.classList.remove('active');
+    num.setAttribute('aria-selected', 'false');
+  });
+
+  slides[current].classList.add('active');
+
+  if (nums[current]) {
+    nums[current].classList.add('active');
+    nums[current].setAttribute('aria-selected', 'true');
+  }
+
+  resetProgress();
+}
+
+  function nextSlide() {
+    goSlide(current + 1);
+  }
+
+  function prevSlide() {
+    goSlide(current - 1);
+  }
+
+  /* ───────────────── FIXED ARROWS ───────────────── */
+
+  var nextBtn = document.querySelector('.hero-next');
+  var prevBtn = document.querySelector('.hero-prev');
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      nextSlide();
+    });
+  }
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      prevSlide();
+    });
+  }
+
+  /* ───────────────── NUMBER NAVIGATION ───────────────── */
+
+  nums.forEach(function (num, i) {
+
+    num.addEventListener('click', function () {
+      goSlide(i);
+    });
+
+    num.addEventListener('keydown', function (e) {
+
+      if (e.key === 'Enter' || e.key === ' ') {
+
+        e.preventDefault();
+        goSlide(i);
+
+      }
+
+    });
+
+  });
+
+  /* ───────────────── KEYBOARD NAVIGATION ───────────────── */
+
+  document.addEventListener('keydown', function (e) {
+
+    if (e.key === 'ArrowRight') {
+      nextSlide();
+    }
+
+    if (e.key === 'ArrowLeft') {
+      prevSlide();
+    }
+
+  });
+
+  /* ───────────────── AUTOPLAY ───────────────── */
+
+  function startAuto() {
+
+    if (!autoplay) return;
+
+    stopAuto();
+
+    autoTimer = setInterval(function () {
+
+      if (!isPaused) {
+        nextSlide();
+      }
+
+    }, speed);
+
+  }
+
+  function stopAuto() {
+    clearInterval(autoTimer);
+  }
+
+  /* ───────────────── PROGRESS BAR ───────────────── */
+
+  function resetProgress() {
+
+    if (!progressBar) return;
+
+    progressBar.style.transition = 'none';
+    progressBar.style.width = '0%';
+
+    if (!isPaused && autoplay) {
+
+      requestAnimationFrame(function () {
+
+        requestAnimationFrame(function () {
+
+          progressBar.style.transition = 'width ' + speed + 'ms linear';
+          progressBar.style.width = '100%';
+
+        });
+
+      });
+
+    }
+
+  }
+
+  /* ───────────────── PAUSE ON HOVER ───────────────── */
+
+  if (hero) {
+
+    hero.addEventListener('mouseenter', function () {
+
+      isPaused = true;
+
+    });
+
+    hero.addEventListener('mouseleave', function () {
+
+      isPaused = false;
+      resetProgress();
+
+    });
+
+  }
+
+  /* ───────────────── TOUCH SWIPE ───────────────── */
+
+  var txStart = 0;
+
+  hero.addEventListener('touchstart', function (e) {
+
+    txStart = e.touches[0].clientX;
+
+  }, { passive: true });
+
+  hero.addEventListener('touchend', function (e) {
+
+    var dx = e.changedTouches[0].clientX - txStart;
+
+    if (Math.abs(dx) > 50) {
+
+      if (dx < 0) {
+        nextSlide();
+      } else {
+        prevSlide();
+      }
+
+    }
+
+  }, { passive: true });
+
+  /* ───────────────── PRODUCT SLIDER ───────────────── */
+
+  function initProdSlider(slider) {
+
+    var track = slider.querySelector('[data-prod-track]');
+    var dotsContainer = slider.querySelector('[data-prod-dots]');
+
+    if (!track) return;
+
+    var items = Array.from(track.querySelectorAll('.prod-item'));
+
+    if (items.length <= 1) return;
+
+    var prodCurrent = 0;
+    var prodTimer = null;
+
+    items.forEach(function (_, i) {
+
+      var dot = document.createElement('button');
+
+      dot.className = 'prod-dot' + (i === 0 ? ' active' : '');
+
+      dot.setAttribute('aria-label', 'Product image ' + (i + 1));
+
+      dot.addEventListener('click', function () {
+
+        prodGoTo(i, i > prodCurrent ? 'next' : 'prev');
+
+      });
+
+      dotsContainer.appendChild(dot);
+
+    });
+
+    var dots = Array.from(dotsContainer.querySelectorAll('.prod-dot'));
+
+    function prodGoTo(index, dir) {
+
+      if (index === prodCurrent) return;
+
+      var prev = prodCurrent;
+
+      var direction = dir || (index > prodCurrent ? 'next' : 'prev');
+
+      items[prev].setAttribute(
+        'data-state',
+        direction === 'next' ? 'exit-left' : 'exit-right'
+      );
+
+      dots[prev].classList.remove('active');
+
+      prodCurrent = ((index % items.length) + items.length) % items.length;
+
+      items[prodCurrent].setAttribute(
+        'data-state',
+        direction === 'next' ? 'enter-right' : 'enter-left'
+      );
+
+      items[prodCurrent].getBoundingClientRect();
+
+      items[prodCurrent].setAttribute('data-state', 'active');
+
+      dots[prodCurrent].classList.add('active');
+
+      var exitItem = items[prev];
+
+      setTimeout(function () {
+
+        exitItem.setAttribute(
+          'data-state',
+          direction === 'next' ? 'enter-right' : 'enter-left'
+        );
+
+      }, 400);
+
+    }
+
+    function startProdAuto() {
+
+      clearInterval(prodTimer);
+
+      prodTimer = setInterval(function () {
+
+        prodGoTo((prodCurrent + 1) % items.length, 'next');
+
+      }, prodSpeed);
+
+    }
+
+    function stopProdAuto() {
+
+      clearInterval(prodTimer);
+
+    }
+
+    slider.addEventListener('mouseenter', stopProdAuto);
+
+    slider.addEventListener('mouseleave', function () {
+
+      if (!isPaused) {
+        startProdAuto();
+      }
+
+    });
+
+    var parentSlide = slider.closest('.hero-slide');
+
+    var obs = new MutationObserver(function () {
+
+      if (parentSlide.classList.contains('active')) {
+
+        startProdAuto();
+
+      } else {
+
+        stopProdAuto();
+
+      }
+
+    });
+
+    obs.observe(parentSlide, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    if (parentSlide.classList.contains('active')) {
+      startProdAuto();
+    }
+
+  }
+
+  document.querySelectorAll('[data-prod-slider]')
+    .forEach(initProdSlider);
+
+  /* ───────────────── START ───────────────── */
+
+  if (autoplay) {
+
+    startAuto();
+    resetProgress();
+
+  }
+
+})();
+</script>
+
+
+{% schema %}
+{
+  "name": "Hero Slider",
+  "max_blocks": 6,
+  "settings": [
+    { "type": "checkbox", "id": "autoplay", "label": "Autoplay slides", "default": true },
+    { "type": "range", "id": "autoplay_speed", "label": "Autoplay speed (seconds)", "min": 3, "max": 12, "step": 1, "default": 5 }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        { "type": "image_picker", "id": "bg_image", "label": "Background image" },
+        { "type": "color", "id": "overlay_color", "label": "Overlay color", "default": "#1C3557" },
+        { "type": "range", "id": "overlay_opacity", "label": "Overlay opacity (%)", "min": 0, "max": 100, "step": 5, "default": 85 },
+        { "type": "text", "id": "eyebrow", "label": "Eyebrow label", "default": "New Collection" },
+        { "type": "text", "id": "title_line1", "label": "Heading — Line 1", "default": "Crafted for the" },
+        { "type": "text", "id": "title_line2", "label": "Heading — Line 2 (italic)", "default": "Culinary Elite" },
+        { "type": "textarea", "id": "subtitle", "label": "Subtitle text", "default": "Born from tradition, elevated by technology." },
+        { "type": "text", "id": "btn1_label", "label": "Button 1 label", "default": "Explore Collection" },
+        { "type": "url", "id": "btn1_url", "label": "Button 1 URL" },
+        { "type": "text", "id": "btn2_label", "label": "Button 2 label", "default": "Our Story" },
+        { "type": "url", "id": "btn2_url", "label": "Button 2 URL" },
+        { "type": "header", "content": "Right Side — Product Slider (Portrait)" },
+        { "type": "image_picker", "id": "product_image_1", "label": "Product image 1" },
+        { "type": "text", "id": "product_label_1", "label": "Product 1 label (optional)" },
+        { "type": "image_picker", "id": "product_image_2", "label": "Product image 2" },
+        { "type": "text", "id": "product_label_2", "label": "Product 2 label (optional)" },
+        { "type": "image_picker", "id": "product_image_3", "label": "Product image 3" },
+        { "type": "text", "id": "product_label_3", "label": "Product 3 label (optional)" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Hero Slider" }]
+}
+{% endschema %}

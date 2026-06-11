@@ -1,0 +1,31 @@
+{
+  "sections": {
+    "page_hero": {
+      "type": "page-hero",
+      "settings": {
+        "eyebrow": "Business",
+        "title": "Wholesale & B2B",
+        "subtitle": "Partner with Relica to bring premium cookware to your customers at competitive margins.",
+        "bg_color": "#1C3557",
+        "text_color": "#FFFFFF",
+        "height": "medium"
+      }
+    },
+    "wholesale_main": {
+      "type": "wholesale-page",
+      "settings": {
+        "benefits_heading": "Why Partner with Relica?",
+        "benefit_1_title": "Competitive Margins",
+        "benefit_1_body": "Attractive wholesale pricing with tiered discounts based on order volume.",
+        "benefit_2_title": "Brand Support",
+        "benefit_2_body": "Co-branded marketing assets, product imagery, and sales training materials.",
+        "benefit_3_title": "Reliable Supply",
+        "benefit_3_body": "Dedicated account managers, priority stock access, and fast fulfilment.",
+        "form_heading": "Apply for Wholesale",
+        "submit_label": "Submit Application",
+        "success_message": "Thank you! Our B2B team will contact you within 2 business days."
+      }
+    }
+  },
+  "order": ["page_hero", "wholesale_main"]
+}

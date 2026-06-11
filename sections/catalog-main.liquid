@@ -1,0 +1,288 @@
+{%- comment -%}
+  Catalogue Main — lists all shop collections with live search, sort, and layout toggle.
+  Uses the global `collections` array (all published collections).
+{%- endcomment -%}
+
+{%- comment -%} Build a sorted & filtered list server-side for initial render {%- endcomment -%}
+{%- assign all_cols = collections -%}
+
+<div class="cat-wrap" id="CatalogWrap">
+
+  {%- comment -%} ── TOOLBAR ── {%- endcomment -%}
+  <div class="cat-toolbar">
+    <div class="cat-toolbar-inner">
+
+      {%- if section.settings.show_search -%}
+        <div class="cat-search-wrap" id="CatSearchWrap">
+          <svg class="cat-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input
+            type="search"
+            id="CatSearch"
+            class="cat-search-input"
+            placeholder="Search collections…"
+            aria-label="Search collections"
+            autocomplete="off"
+            oninput="catalogSearch(this.value)"
+          >
+          <button class="cat-search-clear" id="CatSearchClear" onclick="clearCatalogSearch()" aria-label="Clear search" style="display:none;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      {%- endif -%}
+
+      <div class="cat-toolbar-right">
+        <span class="cat-result-count" id="CatResultCount">{{ collections.size }} collections</span>
+
+        {%- if section.settings.show_sort -%}
+          <div class="cat-sort">
+            <label for="CatSort" class="cat-sort-label">Sort</label>
+            <select id="CatSort" class="cat-sort-select" onchange="catalogSort(this.value)" aria-label="Sort collections">
+              <option value="title-asc">A → Z</option>
+              <option value="title-desc">Z → A</option>
+              <option value="count-desc">Most Products</option>
+              <option value="count-asc">Fewest Products</option>
+            </select>
+          </div>
+        {%- endif -%}
+
+        <div class="cat-layout-toggle" role="group" aria-label="Layout">
+          <button class="cat-layout-btn {% if section.settings.layout == 'grid' %}active{% endif %}" data-layout="grid" onclick="setCatalogLayout('grid')" aria-label="Grid layout" title="Grid">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="2" width="9" height="9" rx="1"/><rect x="13" y="2" width="9" height="9" rx="1"/><rect x="2" y="13" width="9" height="9" rx="1"/><rect x="13" y="13" width="9" height="9" rx="1"/></svg>
+          </button>
+          <button class="cat-layout-btn {% if section.settings.layout == 'list' %}active{% endif %}" data-layout="list" onclick="setCatalogLayout('list')" aria-label="List layout" title="List">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="2" width="20" height="6" rx="1"/><rect x="2" y="10" width="20" height="6" rx="1"/><rect x="2" y="18" width="20" height="6" rx="1"/></svg>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  {%- comment -%} ── COLLECTIONS GRID ── {%- endcomment -%}
+  <div
+    class="cat-grid cat-grid--{{ section.settings.columns }}col {% if section.settings.layout == 'list' %}cat-grid--list{% endif %}"
+    id="CatalogGrid"
+    data-layout="{{ section.settings.layout }}"
+  >
+    {%- if collections.size > 0 -%}
+      {%- for collection in collections -%}
+        {%- unless collection.handle == 'frontpage' -%}
+          {%- assign col_products_count = collection.products_count -%}
+          {%- assign col_title_lower = collection.title | downcase -%}
+          <article
+            class="cat-card reveal"
+            data-title="{{ collection.title | downcase | escape }}"
+            data-count="{{ collection.products_count }}"
+            style="animation-delay:{{ forloop.index0 | times: 40 }}ms;"
+          >
+            <a href="{{ collection.url }}" class="cat-card-img-link" aria-label="{{ collection.title }}">
+              <div class="cat-card-img-wrap">
+                {%- if collection.image != blank -%}
+                  <img
+                    src="{{ collection.image | image_url: width: 800, height: 600, crop: 'center' }}"
+                    alt="{{ collection.image.alt | default: collection.title | escape }}"
+                    class="cat-card-img"
+                    loading="lazy"
+                    width="800"
+                    height="600"
+                  >
+                {%- elsif collection.products.first.featured_image != blank -%}
+                  <img
+                    src="{{ collection.products.first.featured_image | image_url: width: 800, height: 600, crop: 'center' }}"
+                    alt="{{ collection.title | escape }}"
+                    class="cat-card-img"
+                    loading="lazy"
+                    width="800"
+                    height="600"
+                  >
+                {%- else -%}
+                  <div class="cat-card-placeholder">
+                    <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width=".8"><rect x="2" y="2" width="20" height="20" rx="3"/><circle cx="8" cy="8" r="2"/><path d="m21 15-5-5L5 21"/></svg>
+                    <span>{{ collection.title }}</span>
+                  </div>
+                {%- endif -%}
+                <div class="cat-card-overlay"></div>
+
+                {%- comment -%} Product count badge on image {%- endcomment -%}
+                {%- if section.settings.show_product_count -%}
+                  <span class="cat-card-count-badge">{{ col_products_count }} items</span>
+                {%- endif -%}
+
+                {%- comment -%} Arrow on hover {%- endcomment -%}
+                <span class="cat-card-arrow" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </span>
+              </div>
+            </a>
+
+            <div class="cat-card-body">
+              <div class="cat-card-meta">
+                {%- if section.settings.show_product_count -%}
+                  <span class="cat-card-items">{{ col_products_count }} products</span>
+                {%- endif -%}
+              </div>
+              <h2 class="cat-card-title">
+                <a href="{{ collection.url }}">{{ collection.title }}</a>
+              </h2>
+              {%- if section.settings.show_description and collection.description != blank -%}
+                <p class="cat-card-desc">{{ collection.description | strip_html | truncate: 120 }}</p>
+              {%- endif -%}
+
+              {%- comment -%} Product preview thumbnails {%- endcomment -%}
+              {%- if collection.products_count > 0 -%}
+                <div class="cat-card-thumbs" aria-hidden="true">
+                  {%- for product in collection.products limit: 4 -%}
+                    {%- if product.featured_image != blank -%}
+                      <div class="cat-card-thumb">
+                        <img src="{{ product.featured_image | image_url: width: 80, height: 80, crop: 'center' }}" alt="{{ product.title | escape }}" loading="lazy" width="80" height="80">
+                      </div>
+                    {%- endif -%}
+                  {%- endfor -%}
+                  {%- if collection.products_count > 4 -%}
+                    <div class="cat-card-thumb cat-card-thumb--more">+{{ collection.products_count | minus: 4 }}</div>
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+
+              <a href="{{ collection.url }}" class="cat-card-cta">
+                Shop Collection
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </a>
+            </div>
+          </article>
+        {%- endunless -%}
+      {%- endfor -%}
+    {%- else -%}
+      <div class="cat-empty" id="CatEmpty">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width=".8"><rect x="2" y="2" width="20" height="20" rx="3"/><circle cx="8" cy="8" r="2"/><path d="m21 15-5-5L5 21"/></svg>
+        <h3>{{ section.settings.empty_text }}</h3>
+      </div>
+    {%- endif -%}
+  </div>
+
+  {%- comment -%} No-results state (shown via JS) {%- endcomment -%}
+  <div class="cat-no-results" id="CatNoResults" style="display:none;" role="status" aria-live="polite">
+    <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width=".8"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <h3>No collections match "<span id="CatNoResultsTerm"></span>"</h3>
+    <button class="cat-no-results-clear" onclick="clearCatalogSearch()">Clear search</button>
+  </div>
+
+</div>
+
+<script>
+(function() {
+
+  /* ── STATE ── */
+  var grid = document.getElementById('CatalogGrid');
+  var cards = Array.from(grid ? grid.querySelectorAll('.cat-card') : []);
+  var noResults = document.getElementById('CatNoResults');
+  var resultCount = document.getElementById('CatResultCount');
+  var searchInput = document.getElementById('CatSearch');
+  var searchClear = document.getElementById('CatSearchClear');
+  var noResultsTerm = document.getElementById('CatNoResultsTerm');
+
+  var state = {
+    query: '',
+    sort: 'title-asc',
+    layout: localStorage.getItem('relicaCatalogLayout') || '{{ section.settings.layout }}'
+  };
+
+  /* ── INIT ── */
+  setCatalogLayout(state.layout, true);
+
+  /* ── SEARCH ── */
+  window.catalogSearch = function(val) {
+    state.query = val.trim().toLowerCase();
+    searchClear.style.display = state.query ? '' : 'none';
+    render();
+  };
+
+  window.clearCatalogSearch = function() {
+    state.query = '';
+    if (searchInput) searchInput.value = '';
+    searchClear.style.display = 'none';
+    render();
+  };
+
+  /* ── SORT ── */
+  window.catalogSort = function(val) {
+    state.sort = val;
+    render();
+  };
+
+  /* ── LAYOUT ── */
+  window.setCatalogLayout = function(layout, init) {
+    state.layout = layout;
+    if (!init) localStorage.setItem('relicaCatalogLayout', layout);
+    if (grid) {
+      grid.classList.toggle('cat-grid--list', layout === 'list');
+    }
+    var btns = document.querySelectorAll('.cat-layout-btn');
+    btns.forEach(function(b) { b.classList.toggle('active', b.dataset.layout === layout); });
+  };
+
+  /* ── RENDER ── */
+  function render() {
+    if (!grid) return;
+
+    /* Filter */
+    var visible = cards.filter(function(c) {
+      if (!state.query) return true;
+      var title = c.dataset.title || '';
+      return title.indexOf(state.query) !== -1;
+    });
+
+    /* Sort */
+    visible.sort(function(a, b) {
+      switch (state.sort) {
+        case 'title-asc':  return (a.dataset.title || '').localeCompare(b.dataset.title || '');
+        case 'title-desc': return (b.dataset.title || '').localeCompare(a.dataset.title || '');
+        case 'count-desc': return parseInt(b.dataset.count || 0) - parseInt(a.dataset.count || 0);
+        case 'count-asc':  return parseInt(a.dataset.count || 0) - parseInt(b.dataset.count || 0);
+        default: return 0;
+      }
+    });
+
+    /* Hide all, show visible in sorted order */
+    cards.forEach(function(c) { c.style.display = 'none'; c.style.order = ''; });
+    visible.forEach(function(c, i) { c.style.display = ''; c.style.order = i; });
+
+    /* No-results state */
+    var hasResults = visible.length > 0;
+    if (noResults) noResults.style.display = hasResults ? 'none' : '';
+    if (noResultsTerm) noResultsTerm.textContent = state.query;
+
+    /* Count */
+    if (resultCount) {
+      resultCount.textContent = visible.length + ' collection' + (visible.length !== 1 ? 's' : '');
+    }
+  }
+
+  /* ── INITIAL SORT (title-asc is default, already sorted by Shopify typically) ── */
+  render();
+
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Catalogue Main",
+  "settings": [
+    { "type": "checkbox", "id": "show_search", "label": "Show search bar", "default": true },
+    { "type": "checkbox", "id": "show_sort", "label": "Show sort dropdown", "default": true },
+    { "type": "select", "id": "layout", "label": "Default layout", "options": [
+      { "value": "grid", "label": "Grid" },
+      { "value": "list", "label": "List" }
+    ], "default": "grid" },
+    { "type": "select", "id": "columns", "label": "Grid columns (desktop)", "options": [
+      { "value": "2", "label": "2 columns" },
+      { "value": "3", "label": "3 columns" },
+      { "value": "4", "label": "4 columns" }
+    ], "default": "3" },
+    { "type": "checkbox", "id": "show_product_count", "label": "Show product count", "default": true },
+    { "type": "checkbox", "id": "show_description", "label": "Show collection description", "default": true },
+    { "type": "text", "id": "empty_text", "label": "Empty state text", "default": "No collections found." }
+  ],
+  "presets": [{ "name": "Catalogue Main" }]
+}
+{% endschema %}

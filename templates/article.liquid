@@ -1,0 +1,37 @@
+{% layout 'theme' %}
+<div class="page-width" style="max-width:800px;margin:0 auto;padding: var(--section-pad) 20px;">
+  <nav aria-label="Breadcrumb" style="font-size:.8rem;color:var(--mid-gray);margin-bottom:2rem;">
+    <a href="/">Home</a> &rsaquo;
+    <a href="{{ blog.url }}">{{ blog.title }}</a> &rsaquo;
+    <span>{{ article.title }}</span>
+  </nav>
+  <article>
+    <header style="margin-bottom:2rem;">
+      {%- if article.image -%}
+        <img src="{{ article.image | image_url: width: 1200 }}" alt="{{ article.image.alt | default: article.title | escape }}"
+          style="width:100%;border-radius:8px;margin-bottom:1.5rem;" loading="lazy">
+      {%- endif -%}
+      <h1 style="font-family:var(--font-display);font-size:clamp(1.8rem,4vw,3rem);font-weight:300;line-height:1.2;margin-bottom:1rem;">{{ article.title }}</h1>
+      <p style="font-size:.85rem;color:var(--mid-gray);">
+        By {{ article.author }} &nbsp;·&nbsp; {{ article.published_at | date: '%B %d, %Y' }}
+        {%- if article.tags.size > 0 -%}
+          &nbsp;·&nbsp;
+          {%- for tag in article.tags -%}
+            <a href="{{ blog.url }}/tagged/{{ tag | handle }}" style="color:var(--mid-gray);text-decoration:underline;">{{ tag }}</a>{%- unless forloop.last -%}, {%- endunless -%}
+          {%- endfor -%}
+        {%- endif -%}
+      </p>
+    </header>
+    <div class="rte" style="font-size:1rem;line-height:1.75;color:var(--charcoal);">
+      {{ article.content }}
+    </div>
+  </article>
+  <div style="margin-top:40px;padding-top:40px;border-top:1px solid var(--light-gray);display:flex;justify-content:space-between;">
+    {%- if blog.previous_article -%}
+      <a href="{{ blog.previous_article }}" style="color:var(--navy);text-decoration:none;">← Previous</a>
+    {%- else -%}<span>{%- endif -%}
+    {%- if blog.next_article -%}
+      <a href="{{ blog.next_article }}" style="color:var(--navy);text-decoration:none;">Next →</a>
+    {%- else -%}<span>{%- endif -%}
+  </div>
+</div>

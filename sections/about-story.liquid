@@ -1,0 +1,49 @@
+<section class="about-story-section">
+  <div class="about-story-grid">
+    <div class="about-story-visual">
+      {%- if section.settings.image != blank -%}
+        <img src="{{ section.settings.image | image_url: width: 800 }}" alt="{{ section.settings.heading }}" class="about-story-img">
+      {%- else -%}
+        <div class="about-story-placeholder" style="background:#24436b;aspect-ratio:4/5;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.3);font-family:var(--font-display);font-size:18px;">Brand Photography</div>
+      {%- endif -%}
+      {%- if section.settings.sub_image != blank -%}
+        <div class="about-story-sub">
+          <img src="{{ section.settings.sub_image | image_url: width: 400 }}" alt="Secondary">
+        </div>
+      {%- endif -%}
+    </div>
+    <div class="about-story-content">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="section-eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
+      <h2 class="section-title">{{ section.settings.heading }}</h2>
+      {%- if section.settings.body != blank -%}
+        <div class="about-story-body">{{ section.settings.body }}</div>
+      {%- endif -%}
+      {%- if section.settings.quote != blank -%}
+        <blockquote class="story-quote"><p>{{ section.settings.quote }}</p></blockquote>
+      {%- endif -%}
+      {%- if section.settings.btn_label != blank -%}
+        <a href="{{ section.settings.btn_url }}" class="btn-primary">{{ section.settings.btn_label }}</a>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "About Story",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Our Heritage" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Our Story" },
+    { "type": "richtext", "id": "body", "label": "Story text" },
+    { "type": "textarea", "id": "quote", "label": "Pull quote" },
+    { "type": "text", "id": "btn_label", "label": "Button label", "default": "Explore Products" },
+    { "type": "url", "id": "btn_url", "label": "Button URL" },
+    { "type": "header", "content": "Images" },
+    { "type": "image_picker", "id": "image", "label": "Main image" },
+    { "type": "image_picker", "id": "sub_image", "label": "Secondary image (optional)" }
+  ],
+  "presets": [{ "name": "About Story" }]
+}
+{% endschema %}

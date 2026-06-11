@@ -1,0 +1,459 @@
+{% doc %}
+  @prompt
+    Create a "Our Vision & Commitment" section for a kitchen products brand called Relica. The section should include:
+    
+    - A bold heading: "Our Vision & Commitment"
+    - A subheading: "Creating Better Kitchen Experiences for Every Home"
+    - Four paragraphs of body text: (1) At Relica, our vision is to become a trusted household name known for delivering innovative, reliable, and premium kitchen solutions. We are committed to continuously evolving with modern lifestyles and creating products that combine technology, comfort, and elegance. (2) Our dedication to quality and customer satisfaction drives everything we do. From product design to manufacturing, we maintain strict quality standards to ensure every item reflects excellence and reliability. (3) We believe the kitchen is the heart of every home, and our goal is to make every cooking experience simpler, more enjoyable, and more inspiring through thoughtfully designed products. (4) As we continue to grow, Relica remains committed to innovation, durability, and customer trust — bringing modern kitchen excellence into homes across India and beyond.
+    - Clean, professional layout matching the existing Shopify theme with consistent typography, colors, and spacing
+    - All text fields editable in the theme editor
+    - Use theme's existing font styles and color scheme so it blends seamlessly
+    - Subtle decorative divider or accent element between heading and body text
+    - Fully responsive for mobile and desktop
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-vision-commitment-{{ ai_gen_id }} {
+    display: block;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: {{ block.settings.section_padding_top }}px {{ block.settings.section_padding_horizontal }}px {{ block.settings.section_padding_bottom }}px;
+    background-color: {{ block.settings.background_color }};
+  }
+
+  .ai-vision-commitment__container-{{ ai_gen_id }} {
+    max-width: {{ block.settings.content_max_width }}px;
+    margin: 0 auto;
+    text-align: {{ block.settings.text_alignment }};
+  }
+
+  .ai-vision-commitment__heading-{{ ai_gen_id }} {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: {{ block.settings.heading_size }}px;
+    font-weight: {{ block.settings.heading_weight }};
+    color: {{ block.settings.heading_color }};
+    margin: 0 0 {{ block.settings.heading_spacing }}px;
+    line-height: 1.2;
+  }
+
+  .ai-vision-commitment__subheading-{{ ai_gen_id }} {
+    font-family: 'DM Sans', sans-serif;
+    font-size: {{ block.settings.subheading_size }}px;
+    font-weight: 400;
+    color: {{ block.settings.subheading_color }};
+    margin: 0 0 {{ block.settings.subheading_spacing }}px;
+    line-height: 1.5;
+  }
+
+  .ai-vision-commitment__divider-{{ ai_gen_id }} {
+    width: {{ block.settings.divider_width }}px;
+    height: {{ block.settings.divider_height }}px;
+    background-color: {{ block.settings.divider_color }};
+    margin: 0 auto {{ block.settings.divider_spacing }}px;
+    border-radius: {{ block.settings.divider_border_radius }}px;
+  }
+
+  .ai-vision-commitment__body-{{ ai_gen_id }} {
+    font-family: 'DM Sans', sans-serif;
+    font-size: {{ block.settings.body_size }}px;
+    line-height: {{ block.settings.body_line_height }};
+    color: {{ block.settings.body_color }};
+  }
+
+  .ai-vision-commitment__body-{{ ai_gen_id }} p {
+    margin: 0 0 {{ block.settings.paragraph_spacing }}px;
+  }
+
+  .ai-vision-commitment__body-{{ ai_gen_id }} p:last-child {
+    margin-bottom: 0;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-vision-commitment-{{ ai_gen_id }} {
+      padding: {{ block.settings.section_padding_top | times: 0.7 }}px {{ block.settings.section_padding_horizontal | times: 0.6 }}px {{ block.settings.section_padding_bottom | times: 0.7 }}px;
+    }
+
+    .ai-vision-commitment__heading-{{ ai_gen_id }} {
+      font-size: {{ block.settings.heading_size | times: 0.7 }}px;
+      margin-bottom: {{ block.settings.heading_spacing | times: 0.8 }}px;
+    }
+
+    .ai-vision-commitment__subheading-{{ ai_gen_id }} {
+      font-size: {{ block.settings.subheading_size | times: 0.85 }}px;
+      margin-bottom: {{ block.settings.subheading_spacing | times: 0.8 }}px;
+    }
+
+    .ai-vision-commitment__divider-{{ ai_gen_id }} {
+      margin-bottom: {{ block.settings.divider_spacing | times: 0.8 }}px;
+    }
+
+    .ai-vision-commitment__body-{{ ai_gen_id }} {
+      font-size: {{ block.settings.body_size | times: 0.9 }}px;
+    }
+
+    .ai-vision-commitment__body-{{ ai_gen_id }} p {
+      margin-bottom: {{ block.settings.paragraph_spacing | times: 0.85 }}px;
+    }
+  }
+{% endstyle %}
+
+<div class="ai-vision-commitment-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-vision-commitment__container-{{ ai_gen_id }}">
+    {% if block.settings.heading != blank %}
+      <h2 class="ai-vision-commitment__heading-{{ ai_gen_id }}">
+        {{ block.settings.heading }}
+      </h2>
+    {% endif %}
+
+    {% if block.settings.subheading != blank %}
+      <p class="ai-vision-commitment__subheading-{{ ai_gen_id }}">
+        {{ block.settings.subheading }}
+      </p>
+    {% endif %}
+
+    {% if block.settings.show_divider %}
+      <div class="ai-vision-commitment__divider-{{ ai_gen_id }}"></div>
+    {% endif %}
+
+    <div class="ai-vision-commitment__body-{{ ai_gen_id }}">
+      {% if block.settings.paragraph_1 != blank %}
+        <p>{{ block.settings.paragraph_1 }}</p>
+      {% endif %}
+
+      {% if block.settings.paragraph_2 != blank %}
+        <p>{{ block.settings.paragraph_2 }}</p>
+      {% endif %}
+
+      {% if block.settings.paragraph_3 != blank %}
+        <p>{{ block.settings.paragraph_3 }}</p>
+      {% endif %}
+
+      {% if block.settings.paragraph_4 != blank %}
+        <p>{{ block.settings.paragraph_4 }}</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Vision & commitment",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Our Vision & Commitment"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Creating Better Kitchen Experiences for Every Home"
+    },
+    {
+      "type": "textarea",
+      "id": "paragraph_1",
+      "label": "Paragraph 1",
+      "default": "At Relica, our vision is to become a trusted household name known for delivering innovative, reliable, and premium kitchen solutions. We are committed to continuously evolving with modern lifestyles and creating products that combine technology, comfort, and elegance."
+    },
+    {
+      "type": "textarea",
+      "id": "paragraph_2",
+      "label": "Paragraph 2",
+      "default": "Our dedication to quality and customer satisfaction drives everything we do. From product design to manufacturing, we maintain strict quality standards to ensure every item reflects excellence and reliability."
+    },
+    {
+      "type": "textarea",
+      "id": "paragraph_3",
+      "label": "Paragraph 3",
+      "default": "We believe the kitchen is the heart of every home, and our goal is to make every cooking experience simpler, more enjoyable, and more inspiring through thoughtfully designed products."
+    },
+    {
+      "type": "textarea",
+      "id": "paragraph_4",
+      "label": "Paragraph 4",
+      "default": "As we continue to grow, Relica remains committed to innovation, durability, and customer trust — bringing modern kitchen excellence into homes across India and beyond."
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "label": "Content max width",
+      "min": 600,
+      "max": 1200,
+      "step": 50,
+      "unit": "px",
+      "default": 900
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "section_padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "section_padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "section_padding_horizontal",
+      "label": "Horizontal padding",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "heading_spacing",
+      "label": "Heading bottom spacing",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "subheading_spacing",
+      "label": "Subheading bottom spacing",
+      "min": 15,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "paragraph_spacing",
+      "label": "Paragraph spacing",
+      "min": 10,
+      "max": 40,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Heading style"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Heading size",
+      "min": 24,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 42
+    },
+    {
+      "type": "select",
+      "id": "heading_weight",
+      "label": "Heading weight",
+      "options": [
+        {
+          "value": "300",
+          "label": "Light"
+        },
+        {
+          "value": "400",
+          "label": "Regular"
+        },
+        {
+          "value": "600",
+          "label": "Semi-bold"
+        },
+        {
+          "value": "700",
+          "label": "Bold"
+        }
+      ],
+      "default": "600"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#1C3557"
+    },
+    {
+      "type": "header",
+      "content": "Subheading style"
+    },
+    {
+      "type": "range",
+      "id": "subheading_size",
+      "label": "Subheading size",
+      "min": 14,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "color",
+      "id": "subheading_color",
+      "label": "Subheading color",
+      "default": "#888780"
+    },
+    {
+      "type": "header",
+      "content": "Divider"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_divider",
+      "label": "Show divider",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "divider_width",
+      "label": "Divider width",
+      "min": 30,
+      "max": 150,
+      "step": 10,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "divider_height",
+      "label": "Divider height",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "unit": "px",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "divider_border_radius",
+      "label": "Divider border radius",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "divider_spacing",
+      "label": "Divider bottom spacing",
+      "min": 15,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "default": 35
+    },
+    {
+      "type": "color",
+      "id": "divider_color",
+      "label": "Divider color",
+      "default": "#C4827A"
+    },
+    {
+      "type": "header",
+      "content": "Body text style"
+    },
+    {
+      "type": "range",
+      "id": "body_size",
+      "label": "Body text size",
+      "min": 13,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "body_line_height",
+      "label": "Body line height",
+      "min": 1,
+      "max": 2,
+      "step": 0.1,
+      "default": 1.7
+    },
+    {
+      "type": "color",
+      "id": "body_color",
+      "label": "Body text color",
+      "default": "#2C2C2A"
+    },
+    {
+      "type": "header",
+      "content": "Background"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#FDFAF6"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Vision & commitment"
+    }
+  ]
+}
+{% endschema %}

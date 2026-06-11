@@ -1,0 +1,97 @@
+{
+  "sections": {
+    "product_main": {
+      "type": "product-main",
+      "blocks": {
+        "spec_material": {
+          "type": "spec_row",
+          "settings": { "label": "Material", "value": "Die-Cast Aluminium" }
+        },
+        "spec_coating": {
+          "type": "spec_row",
+          "settings": { "label": "Coating", "value": "PFOA-Free Non-Stick (3-layer)" }
+        },
+        "spec_base": {
+          "type": "spec_row",
+          "settings": { "label": "Base Thickness", "value": "4.5 mm" }
+        },
+        "spec_warranty": {
+          "type": "spec_row",
+          "settings": { "label": "Warranty", "value": "5 Years (cookware)" }
+        },
+        "spec_cert": {
+          "type": "spec_row",
+          "settings": { "label": "Certification", "value": "ISI Certified (IS 14101)" }
+        },
+        "spec_handle": {
+          "type": "spec_row",
+          "settings": { "label": "Handle", "value": "Bakelite, heat-resistant" }
+        },
+        "spec_oven": {
+          "type": "spec_row",
+          "settings": { "label": "Oven Safe", "value": "Up to 180°C (without lid)" }
+        }
+      },
+      "block_order": [
+        "spec_material",
+        "spec_coating",
+        "spec_base",
+        "spec_warranty",
+        "spec_cert",
+        "spec_handle",
+        "spec_oven"
+      ],
+      "settings": {
+        "trust1": "Up to 5-Year Warranty",
+        "trust2": "ISI Certified · PFOA Free",
+        "trust3": "Free Delivery Above ₹999",
+        "trust4": "Made for Indian Kitchens",
+        "show_sku": true,
+        "show_buy_now": true,
+        "show_specs": true,
+        "show_compat": true,
+        "show_shipping": true,
+        "show_reviews": true,
+        "compat_intro": "All Relica cookware is engineered for universal cooktop compatibility — works on gas, induction, electric, ceramic, and halogen cooktops.",
+        "shipping_text": "",
+        "show_related": true,
+        "related_eyebrow": "From the Same Series",
+        "related_title_plain": "You May Also",
+        "related_title_italic": "Like"
+      }
+    },
+    "trust_bar": {
+      "type": "trust-bar",
+      "settings": {
+        "icon_color": "#1C3557",
+        "label_color": "#1C3557",
+        "label1": "Built to Last",
+        "desc1": "Up to 5-year warranty",
+        "label2": "100% Food Safe",
+        "desc2": "PFOA free & food grade",
+        "label3": "Universal Compatibility",
+        "desc3": "Gas, induction, electric & more",
+        "label4": "ISI Certified",
+        "desc4": "Meets Indian safety standards"
+      }
+    },
+    "cta_banner": {
+      "type": "cta-banner",
+      "settings": {
+        "title_line1": "Explore the Full",
+        "title_line2_plain": "Relica",
+        "title_line2_italic": "Collection",
+        "subtitle": "From premium Die-Cast nonstick to Triply stainless steel — discover cookware crafted for the way India cooks.",
+        "btn1_label": "Shop All Products",
+        "btn1_url": "/collections/all",
+        "btn2_label": "Download Catalogue",
+        "btn2_url": ""
+      }
+    }
+  },
+  "order": [
+    "product_main",
+    "trust_bar",
+    "cta_banner"
+  ]
+}

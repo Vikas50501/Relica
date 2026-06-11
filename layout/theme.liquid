@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="{{ request.locale.iso_code }}" data-currency-symbol="{{ cart.currency.symbol | escape }}" data-currency-locale="{{ request.locale.iso_code | replace: '-', '_' }}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ page_title }}{% unless page_title == shop.name %} — {{ shop.name }}{% endunless %}</title>
+<meta name="description" content="{{ page_description | escape }}">
+
+{%- comment -%} Open Graph / Social sharing {%- endcomment -%}
+<meta property="og:site_name" content="{{ shop.name }}">
+<meta property="og:url" content="{{ canonical_url }}">
+<meta property="og:title" content="{{ page_title | escape }}">
+<meta property="og:description" content="{{ page_description | escape }}">
+<meta property="og:type" content="{% if request.page_type == 'product' %}product{% elsif request.page_type == 'article' %}article{% else %}website{% endif %}">
+{%- if request.page_type == 'product' -%}
+  <meta property="og:price:amount" content="{{ product.price | money_without_currency | strip_html }}">
+  <meta property="og:price:currency" content="{{ cart.currency.iso_code }}">
+{%- endif -%}
+{%- assign og_image = og_image_url | default: settings.share_image -%}
+{%- if request.page_type == 'product' and product.featured_image -%}
+  {%- assign og_image = product.featured_image | image_url: width: 1200 -%}
+{%- elsif request.page_type == 'article' and article.image -%}
+  {%- assign og_image = article.image | image_url: width: 1200 -%}
+{%- endif -%}
+{%- if og_image -%}
+  <meta property="og:image" content="https:{{ og_image }}">
+  <meta property="og:image:width" content="1200">
+{%- endif -%}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ page_title | escape }}">
+<meta name="twitter:description" content="{{ page_description | escape }}">
+{%- if og_image -%}<meta name="twitter:image" content="https:{{ og_image }}">{%- endif -%}
+<link rel="canonical" href="{{ canonical_url }}">
+{%- if settings.favicon != blank -%}
+  <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32 }}">
+{%- endif -%}
+{{ content_for_header }}
+
+{%- comment -%} Google Fonts — dynamic based on theme settings {%- endcomment -%}
+{%- assign display_font = settings.font_display_family | default: 'Cormorant Garamond' -%}
+{%- assign body_font = settings.font_body_family | default: 'DM Sans' -%}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family={{ display_font | replace: ' ', '+' }}:ital,wght@0,300;0,400;0,600;1,300;1,400&family={{ body_font | replace: ' ', '+' }}:wght@300;400;500&display=swap" rel="stylesheet">
+
+{{ 'relica.css' | asset_url | stylesheet_tag }}
+
+<style>
+  :root {
+    --navy: {{ settings.color_primary | default: '#1C3557' }};
+    --navy-deep: {{ settings.color_primary | color_darken: 20 | default: '#0F1F33' }};
+    --navy-mid: {{ settings.color_primary | color_lighten: 10 | default: '#24436B' }};
+    --rose: {{ settings.color_accent | default: '#C4827A' }};
+    --rose-mid: {{ settings.color_accent | color_lighten: 10 | default: '#D9A49E' }};
+    --rose-bg: {{ settings.color_accent | color_lighten: 35 | default: '#F7EDEB' }};
+    --charcoal: {{ settings.color_text_body | default: '#2C2C2A' }};
+    --mid-gray: {{ settings.color_text_muted | default: '#888780' }};
+    --warm-white: {{ settings.color_bg_main | default: '#FDFAF6' }};
+    --cream: {{ settings.color_bg_cream | default: '#F5F0E8' }};
+    --cream-dark: {{ settings.color_bg_cream | color_darken: 8 | default: '#EDE5D8' }};
+    --off-white: {{ settings.color_bg_off_white | default: '#F9F7F4' }};
+    --sage: {{ settings.color_secondary | default: '#6B7C5E' }};
+    --sage-bg: {{ settings.color_secondary | color_lighten: 40 | default: '#EDF0E9' }};
+    --light-gray: #D3D1C7;
+    --font-display: '{{ display_font }}', serif;
+    --font-body: '{{ body_font }}', sans-serif;
+    --container: {{ settings.container_width | default: '1320px' }};
+    --btn-radius: {% case settings.btn_style %}{% when 'slight' %}4px{% when 'rounded' %}8px{% when 'pill' %}999px{% else %}0px{% endcase %};
+    {%- assign base_size = settings.font_size_base | default: 15 -%}
+    --font-size-base: {{ base_size }}px;
+    {%- assign spacing_scale = settings.section_spacing | default: 'medium' -%}
+    --section-pad: {% case spacing_scale %}{% when 'compact' %}56px{% when 'relaxed' %}100px{% when 'spacious' %}120px{% else %}80px{% endcase %};
+  }
+  body {
+    font-size: var(--font-size-base);
+  }
+  .btn-primary, .btn-ghost, .btn-outline {
+    border-radius: var(--btn-radius);
+    {%- if settings.btn_uppercase != false -%}text-transform: uppercase;{%- endif -%}
+  }
+  /* ATC overrides */
+  .btn-atc {
+    background: {{ settings.color_atc_bg | default: '#1C3557' }};
+    color: {{ settings.color_atc_text | default: '#FFFFFF' }};
+  }
+  .btn-atc:hover {
+    background: {{ settings.color_atc_hover | default: '#0F1F33' }};
+  }
+</style>
+</head>
+<body>
+
+{% section 'header' %}
+
+<main id="MainContent">{{ content_for_layout }}</main>
+
+{% section 'footer' %}
+
+{{ 'relica.js' | asset_url | script_tag }}
+
+{%- comment -%} Cart drawer (if enabled) {%- endcomment -%}
+{%- if settings.cart_type == 'drawer' -%}
+  <div id="cart-drawer" class="cart-drawer" aria-hidden="true">
+    <div class="cart-drawer-overlay"></div>
+    <div class="cart-drawer-panel">
+      <div class="cart-drawer-header">
+        <span class="cart-drawer-title">Your Cart</span>
+        <button class="cart-drawer-close" aria-label="Close cart">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="cart-drawer-body">
+        {%- if cart.item_count == 0 -%}
+          <div class="cart-drawer-empty">
+            <p>Your cart is empty</p>
+            <a href="/collections/all" class="btn-primary" style="margin-top:16px;display:inline-block;">Shop Now</a>
+          </div>
+        {%- else -%}
+          {%- for item in cart.items -%}
+            <div class="cart-drawer-item">
+              {%- if item.image -%}
+                <img src="{{ item.image | image_url: width: 100 }}" alt="{{ item.title }}" class="cart-drawer-img">
+              {%- endif -%}
+              <div class="cart-drawer-info">
+                <a href="{{ item.url }}" class="cart-drawer-item-title">{{ item.product.title }}</a>
+                {%- unless item.product.has_only_default_variant -%}
+                  <p class="cart-drawer-variant">{{ item.variant.title }}</p>
+                {%- endunless -%}
+                <div class="cart-drawer-row">
+                  <span class="cart-drawer-price">{{ item.final_price | money }}</span>
+                  <span class="cart-drawer-qty">Qty: {{ item.quantity }}</span>
+                </div>
+              </div>
+            </div>
+          {%- endfor -%}
+        {%- endif -%}
+      </div>
+      {%- if cart.item_count > 0 -%}
+        <div class="cart-drawer-footer">
+          <div class="cart-drawer-subtotal">
+            <span>Subtotal</span>
+            <span>{{ cart.total_price | money }}</span>
+          </div>
+          <a href="/cart" class="btn-outline" style="display:block;text-align:center;margin-bottom:10px;">View Cart</a>
+          <a href="/checkout" class="btn-primary btn-full">Checkout</a>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+{%- endif -%}
+
+</body>
+</html>
