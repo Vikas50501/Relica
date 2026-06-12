@@ -41,7 +41,7 @@
             "title_line1": "The Hybrid",
             "title_line2": "Cooking Surface",
             "subtitle": "Stainless–nonstick fusion. The unique honeycomb pattern protects your coating and ensures even cooking every time.",
-            "btn1_label": "Shop Honeycomb",
+            "btn1_label": "Explore Collection",
             "btn1_url": "shopify://collections/honeycomb-series",
             "btn2_label": "Learn More",
             "btn2_url": "shopify://pages/about-us",
@@ -76,7 +76,7 @@
         "slide1"
       ],
       "settings": {
-        "autoplay": false,
+        "autoplay": true,
         "autoplay_speed": 8
       }
     },
