@@ -805,7 +805,7 @@
       "settings": {
         "enable": true,
         "delay_seconds": 5,
-        "frequency_days": 2,
+        "frequency_days": 0,
         "heading": "🎉 Get 10% Off Your First Order",
         "description": "Join our community and receive an exclusive discount code instantly.",
         "button_label": "Get My Discount",
