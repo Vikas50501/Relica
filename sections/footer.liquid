@@ -74,7 +74,10 @@
               autocomplete="email"
               required
               aria-label="Email address">
-            <button type="submit" class="fn-btn">{{ section.settings.newsletter_button }}</button>
+            <button type="submit" class="fn-btn">
+              <span class="fn-btn-label">{{ section.settings.newsletter_button }}</span>
+              <span class="fn-btn-spinner" aria-hidden="true"></span>
+            </button>
           </div>
           <p class="fn-msg" role="status" aria-live="polite"></p>
         </form>
@@ -112,25 +115,43 @@
   .fn-input{
     flex:1;min-width:0;background:transparent;
     border:1px solid rgba(255,255,255,.2);border-right:none;
-    color:#fff;padding:14px 16px;font-size:14px;
+    color:#fff;padding:15px 18px;font-size:14px;
     font-family:var(--font-body);outline:none;transition:border-color .2s;
   }
   .fn-input::placeholder{color:rgba(255,255,255,.4);}
   .fn-input:focus{border-color:var(--rose-mid);}
+  /* Button — mirrors the theme's primary CTA (uppercase, .12em, rose accent) */
   .fn-btn{
-    background:var(--rose-mid);color:var(--navy-deep);border:none;
-    padding:14px 28px;font-size:12px;letter-spacing:.12em;
+    position:relative;display:inline-flex;align-items:center;justify-content:center;
+    min-width:132px;background:var(--rose-mid);color:var(--navy-deep);border:none;
+    padding:15px 32px;font-size:12px;letter-spacing:.12em;
     text-transform:uppercase;font-weight:600;cursor:pointer;
-    font-family:var(--font-body);transition:background .2s;white-space:nowrap;
+    font-family:var(--font-body);transition:background .25s ease,opacity .2s ease;white-space:nowrap;
   }
   .fn-btn:hover{background:#fff;}
-  .fn-btn:disabled{opacity:.6;cursor:default;}
+  .fn-btn:disabled{cursor:default;}
+  .fn-btn.is-loading{opacity:.92;}
+  .fn-btn.is-loading .fn-btn-label{visibility:hidden;}
+  .fn-btn-spinner{
+    display:none;width:15px;height:15px;border-radius:50%;
+    border:2px solid rgba(28,53,87,.3);border-top-color:var(--navy-deep);
+    animation:fn-spin .6s linear infinite;
+  }
+  .fn-btn.is-loading .fn-btn-spinner{display:block;position:absolute;}
+  @keyframes fn-spin{to{transform:rotate(360deg);}}
   .fn-msg{font-size:12px;margin:10px 0 0;min-height:1em;font-weight:300;}
   .fn-msg.ok{color:var(--rose-mid);}
   .fn-msg.err{color:#ff9b9b;}
   @media(max-width:768px){
-    .footer-newsletter{flex-direction:column;align-items:flex-start;}
+    .footer-newsletter{flex-direction:column;align-items:flex-start;gap:24px;}
     .fn-form{width:100%;}
+    .footer-newsletter .fn-title{font-size:21px;}
+  }
+  /* On small phones, stack the field and button full-width for easy tapping */
+  @media(max-width:480px){
+    .fn-row{flex-direction:column;gap:10px;}
+    .fn-input{border-right:1px solid rgba(255,255,255,.2);text-align:center;}
+    .fn-btn{width:100%;}
   }
 </style>
 
@@ -163,9 +184,8 @@
       return;
     }
 
-    var original = btn.textContent;
     btn.disabled = true;
-    btn.textContent = '…';
+    btn.classList.add('is-loading');
 
     var data = new URLSearchParams();
     data.append('email', email);
@@ -185,7 +205,7 @@
       })
       .finally(function () {
         btn.disabled = false;
-        btn.textContent = original;
+        btn.classList.remove('is-loading');
       });
   });
 })();
