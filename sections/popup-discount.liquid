@@ -1,0 +1,504 @@
+{%- comment -%}
+  Popup — Discount (popup-discount.liquid)
+  Premium homepage email-capture popup with discount reveal.
+  - Registers subscribers via Shopify's native {% form 'customer' %}
+    (stored in Customers + Email Marketing). Submitted over fetch for the
+    in-popup success state; degrades to a normal POST if JS is unavailable.
+  - All text/colours/timing editable in the Theme Customizer.
+  NOTE: This shows the discount CODE. Create the matching code (e.g. WELCOME10)
+  under Shopify admin → Discounts for it to actually work at checkout.
+{%- endcomment -%}
+
+{%- liquid
+  assign code = section.settings.discount_code | default: 'WELCOME10'
+  assign success_msg = section.settings.success_message | replace: '[code]', code
+  assign form_id = 'RpopupForm-' | append: section.id
+-%}
+
+{%- if section.settings.enable -%}
+  <div
+    id="Rpopup-{{ section.id }}"
+    class="rpopup"
+    data-rpopup
+    data-delay="{{ section.settings.delay_seconds }}"
+    data-days="{{ section.settings.frequency_days }}"
+    data-storage-key="rpopup-{{ section.id }}"
+    style="
+      --rp-bg:{{ section.settings.bg_color }};
+      --rp-text:{{ section.settings.text_color }};
+      --rp-heading:{{ section.settings.heading_color }};
+      --rp-btn:{{ section.settings.button_color }};
+      --rp-btn-text:{{ section.settings.button_text_color }};
+      --rp-overlay:{{ section.settings.overlay_color }};
+      --rp-overlay-opacity:{{ section.settings.overlay_opacity | divided_by: 100.0 }};
+      --rp-radius:{{ section.settings.border_radius }}px;
+    "
+    hidden
+  >
+    <div class="rpopup__overlay" data-rpopup-overlay></div>
+
+    <div
+      class="rpopup__dialog{% if section.settings.image != blank %} rpopup__dialog--split{% endif %}"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="RpopupHeading-{{ section.id }}"
+      aria-describedby="RpopupDesc-{{ section.id }}"
+    >
+      <button type="button" class="rpopup__close" data-rpopup-close aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      {%- if section.settings.image != blank -%}
+        <div class="rpopup__media">
+          <img
+            src="{{ section.settings.image | image_url: width: 900 }}"
+            alt="{{ section.settings.image.alt | escape }}"
+            loading="lazy"
+            width="{{ section.settings.image.width }}"
+            height="{{ section.settings.image.height }}"
+          >
+        </div>
+      {%- endif -%}
+
+      <div class="rpopup__body">
+        {%- comment -%} ---------- FORM STATE ---------- {%- endcomment -%}
+        <div class="rpopup__state" data-rpopup-form-state>
+          {%- if section.settings.heading != blank -%}
+            <h2 class="rpopup__heading" id="RpopupHeading-{{ section.id }}">{{ section.settings.heading }}</h2>
+          {%- endif -%}
+          {%- if section.settings.description != blank -%}
+            <p class="rpopup__desc" id="RpopupDesc-{{ section.id }}">{{ section.settings.description }}</p>
+          {%- endif -%}
+
+          {%- form 'customer', id: form_id, class: 'rpopup__form', novalidate: 'novalidate' -%}
+            <input type="hidden" name="contact[tags]" value="newsletter, popup-discount">
+
+            <div class="rpopup__field">
+              <label for="RpopupName-{{ section.id }}">{{ section.settings.firstname_label }} <span aria-hidden="true">*</span></label>
+              <input
+                id="RpopupName-{{ section.id }}"
+                type="text"
+                name="contact[first_name]"
+                autocomplete="given-name"
+                required
+                aria-required="true"
+              >
+            </div>
+
+            <div class="rpopup__field">
+              <label for="RpopupEmail-{{ section.id }}">{{ section.settings.email_label }} <span aria-hidden="true">*</span></label>
+              <input
+                id="RpopupEmail-{{ section.id }}"
+                type="email"
+                name="contact[email]"
+                autocomplete="email"
+                required
+                aria-required="true"
+              >
+            </div>
+
+            {%- if section.settings.show_phone -%}
+              <div class="rpopup__field">
+                <label for="RpopupPhone-{{ section.id }}">{{ section.settings.phone_label }}</label>
+                <input
+                  id="RpopupPhone-{{ section.id }}"
+                  type="tel"
+                  name="contact[phone]"
+                  autocomplete="tel"
+                >
+              </div>
+            {%- endif -%}
+
+            <p class="rpopup__error" data-rpopup-error role="alert" aria-live="assertive" hidden></p>
+
+            <button type="submit" class="rpopup__btn" data-rpopup-submit>
+              <span class="rpopup__btn-label">{{ section.settings.button_label }}</span>
+              <span class="rpopup__spinner" aria-hidden="true"></span>
+            </button>
+
+            {%- if section.settings.consent_text != blank -%}
+              <p class="rpopup__consent">{{ section.settings.consent_text }}</p>
+            {%- endif -%}
+          {%- endform -%}
+        </div>
+
+        {%- comment -%} ---------- SUCCESS STATE ---------- {%- endcomment -%}
+        <div class="rpopup__state rpopup__success" data-rpopup-success hidden>
+          <div class="rpopup__check" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <path d="M4 12.5l5 5L20 6.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          {%- if section.settings.success_heading != blank -%}
+            <h2 class="rpopup__heading">{{ section.settings.success_heading }}</h2>
+          {%- endif -%}
+          {%- if success_msg != blank -%}
+            <p class="rpopup__desc">{{ success_msg }}</p>
+          {%- endif -%}
+
+          <div class="rpopup__code">
+            <span class="rpopup__code-value" data-rpopup-code>{{ code }}</span>
+            <button type="button" class="rpopup__copy" data-rpopup-copy data-code="{{ code | escape }}">
+              {{ section.settings.copy_label }}
+            </button>
+          </div>
+          <p class="rpopup__copied" data-rpopup-copied role="status" aria-live="polite" hidden>Copied to clipboard!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+.rpopup,.rpopup *,.rpopup *::before,.rpopup *::after{box-sizing:border-box;}
+.rpopup{
+  position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;
+  padding:20px;opacity:0;transition:opacity .35s ease;
+  font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;
+}
+.rpopup[hidden]{display:none;}
+.rpopup.is-open{opacity:1;}
+
+.rpopup__overlay{position:absolute;inset:0;background:var(--rp-overlay,#0F1F33);opacity:var(--rp-overlay-opacity,.6);cursor:pointer;}
+
+.rpopup__dialog{
+  position:relative;z-index:1;display:flex;width:100%;max-width:460px;
+  background:var(--rp-bg,#fff);color:var(--rp-text,#2C2C2A);
+  border-radius:var(--rp-radius,16px);overflow:hidden;
+  box-shadow:0 30px 80px -24px rgba(15,31,51,.55);
+  max-height:calc(100vh - 40px);
+  transform:translateY(18px) scale(.98);
+  transition:transform .42s cubic-bezier(.22,1,.36,1);
+}
+.rpopup.is-open .rpopup__dialog{transform:none;}
+.rpopup__dialog--split{max-width:840px;}
+
+.rpopup__media{display:none;}
+.rpopup__dialog--split .rpopup__media{display:block;flex:1 1 45%;}
+.rpopup__media img{width:100%;height:100%;min-height:100%;object-fit:cover;display:block;}
+
+.rpopup__body{flex:1 1 auto;padding:46px 40px;overflow-y:auto;}
+
+.rpopup__close{
+  position:absolute;top:14px;right:14px;z-index:2;width:38px;height:38px;
+  display:flex;align-items:center;justify-content:center;
+  border:none;border-radius:50%;background:rgba(15,31,51,.07);color:var(--rp-text,#2C2C2A);
+  cursor:pointer;transition:background .2s ease,transform .25s ease;
+}
+.rpopup__close:hover{background:rgba(15,31,51,.14);transform:rotate(90deg);}
+.rpopup__close svg{width:16px;height:16px;}
+
+.rpopup__heading{
+  font-family:inherit;font-size:26px;line-height:1.2;font-weight:700;letter-spacing:-.01em;
+  color:var(--rp-heading,#1C3557);margin:0 0 10px;
+}
+.rpopup__desc{font-size:15px;line-height:1.6;margin:0 0 22px;opacity:.85;}
+
+.rpopup__field{margin-bottom:14px;text-align:left;}
+.rpopup__field label{display:block;font-size:12px;font-weight:600;letter-spacing:.02em;margin-bottom:6px;}
+.rpopup__field input{
+  width:100%;padding:13px 14px;font-size:15px;font-family:inherit;color:inherit;
+  background:#fff;border:1px solid rgba(15,31,51,.2);border-radius:10px;outline:none;
+  transition:border-color .2s ease,box-shadow .2s ease;
+}
+.rpopup__field input::placeholder{color:rgba(15,31,51,.4);}
+.rpopup__field input:focus{
+  border-color:var(--rp-btn,#1C3557);
+  box-shadow:0 0 0 3px color-mix(in srgb, var(--rp-btn,#1C3557) 18%, transparent);
+}
+
+.rpopup__error{color:#c0392b;font-size:13px;line-height:1.4;margin:0 0 12px;}
+
+/* Matches the theme's .btn-primary (uppercase, square, darken on hover) */
+.rpopup__btn{
+  position:relative;width:100%;padding:16px 32px;margin-top:4px;
+  font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;font-family:inherit;
+  color:var(--rp-btn-text,#fff);background:var(--rp-btn,#1C3557);
+  border:none;border-radius:0;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;
+  transition:background .2s ease,filter .2s ease;
+}
+.rpopup__btn:hover{filter:brightness(.88);}
+.rpopup__btn:active{filter:brightness(.82);}
+.rpopup__btn:disabled{cursor:default;opacity:.85;filter:none;}
+.rpopup__btn.is-loading .rpopup__btn-label{visibility:hidden;}
+.rpopup__spinner{
+  display:none;position:absolute;width:18px;height:18px;border-radius:50%;
+  border:2px solid rgba(255,255,255,.4);border-top-color:var(--rp-btn-text,#fff);
+  animation:rpopup-spin .6s linear infinite;
+}
+.rpopup__btn.is-loading .rpopup__spinner{display:block;}
+@keyframes rpopup-spin{to{transform:rotate(360deg);}}
+
+.rpopup__consent{font-size:11px;line-height:1.5;opacity:.6;margin:12px 0 0;}
+
+/* Success state */
+.rpopup__success{text-align:center;}
+.rpopup__check{
+  width:62px;height:62px;margin:0 auto 18px;border-radius:50%;
+  background:var(--rp-btn,#1C3557);color:var(--rp-btn-text,#fff);
+  display:flex;align-items:center;justify-content:center;
+  transform:scale(0);animation:rpopup-pop .5s cubic-bezier(.22,1.4,.36,1) .05s forwards;
+}
+.rpopup__check svg{width:28px;height:28px;}
+@keyframes rpopup-pop{to{transform:scale(1);}}
+.rpopup__code{
+  display:flex;align-items:stretch;margin-top:22px;
+  border:1px dashed var(--rp-btn,#1C3557);border-radius:10px;overflow:hidden;
+}
+.rpopup__code-value{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  font-size:18px;font-weight:700;letter-spacing:.14em;padding:12px;
+  color:var(--rp-heading,#1C3557);
+}
+.rpopup__copy{
+  border:none;background:var(--rp-btn,#1C3557);color:var(--rp-btn-text,#fff);
+  font-family:inherit;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  padding:0 18px;cursor:pointer;white-space:nowrap;transition:filter .2s ease;
+}
+.rpopup__copy:hover{filter:brightness(1.12);}
+.rpopup__copy.is-copied{background:#2e7d32;}
+.rpopup__copied{font-size:12px;color:#2e7d32;margin:10px 0 0;}
+
+/* Tablet */
+@media (max-width:768px){
+  .rpopup__dialog--split{max-width:520px;}
+  .rpopup__dialog--split .rpopup__media{display:none;}
+}
+
+/* Mobile — bottom sheet */
+@media (max-width:600px){
+  .rpopup{padding:0;align-items:flex-end;}
+  .rpopup__dialog{
+    max-width:100%;max-height:92vh;border-radius:18px 18px 0 0;
+    transform:translateY(100%);
+  }
+  .rpopup.is-open .rpopup__dialog{transform:none;}
+  .rpopup__body{padding:38px 22px 26px;}
+  .rpopup__heading{font-size:22px;}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .rpopup,.rpopup__dialog,.rpopup__btn,.rpopup__close,.rpopup__check,.rpopup__spinner{
+    transition:none!important;animation:none!important;
+  }
+  .rpopup__dialog{transform:none!important;}
+  .rpopup__check{transform:scale(1)!important;}
+}
+{% endstylesheet %}
+
+{% javascript %}
+(function () {
+  function init(root) {
+    if (root.dataset.rpopupInit) return;
+    root.dataset.rpopupInit = '1';
+
+    var overlay = root.querySelector('[data-rpopup-overlay]');
+    var dialog = root.querySelector('[role="dialog"]');
+    var closeBtn = root.querySelector('[data-rpopup-close]');
+    var form = root.querySelector('form');
+    var submitBtn = root.querySelector('[data-rpopup-submit]');
+    var errorEl = root.querySelector('[data-rpopup-error]');
+    var formState = root.querySelector('[data-rpopup-form-state]');
+    var successState = root.querySelector('[data-rpopup-success]');
+    var copyBtn = root.querySelector('[data-rpopup-copy]');
+    var copiedMsg = root.querySelector('[data-rpopup-copied]');
+
+    var delay = parseInt(root.dataset.delay, 10); if (isNaN(delay)) delay = 5;
+    var days = parseInt(root.dataset.days, 10); if (isNaN(days)) days = 7;
+    var storageKey = root.dataset.storageKey || 'rpopup';
+    var designMode = !!(window.Shopify && window.Shopify.designMode);
+    var EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+    var lastFocus = null;
+    var timer = null;
+
+    function seen() {
+      if (designMode || !days) return false;
+      try {
+        var v = localStorage.getItem(storageKey);
+        return !!v && (Date.now() - parseInt(v, 10)) < days * 86400000;
+      } catch (e) { return false; }
+    }
+    function remember() {
+      if (designMode) return;
+      try { localStorage.setItem(storageKey, String(Date.now())); } catch (e) {}
+    }
+
+    function open() {
+      if (!root.hidden && root.classList.contains('is-open')) return;
+      lastFocus = document.activeElement;
+      root.hidden = false;
+      void root.offsetWidth; // reflow so the fade-in transition runs
+      root.classList.add('is-open');
+      document.documentElement.style.overflow = 'hidden';
+      remember();
+      var first = root.querySelector('input, [data-rpopup-close]');
+      if (first) { try { first.focus(); } catch (e) {} }
+      document.addEventListener('keydown', onKeydown);
+    }
+    function close() {
+      root.classList.remove('is-open');
+      document.documentElement.style.overflow = '';
+      document.removeEventListener('keydown', onKeydown);
+      var hide = function () { root.hidden = true; root.removeEventListener('transitionend', hide); };
+      root.addEventListener('transitionend', hide);
+      setTimeout(function () { root.hidden = true; }, 450);
+      if (lastFocus && lastFocus.focus) { try { lastFocus.focus(); } catch (e) {} }
+    }
+
+    function onKeydown(e) {
+      if (e.key === 'Escape') { close(); return; }
+      if (e.key === 'Tab') trap(e);
+    }
+    function trap(e) {
+      var nodes = dialog.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),[tabindex]:not([tabindex="-1"])');
+      var list = Array.prototype.filter.call(nodes, function (el) { return el.offsetParent !== null; });
+      if (!list.length) return;
+      var first = list[0], last = list[list.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+
+    function showError(msg) { if (errorEl) { errorEl.textContent = msg; errorEl.hidden = false; } }
+    function clearError() { if (errorEl) { errorEl.hidden = true; errorEl.textContent = ''; } }
+    function loading(on) { if (submitBtn) { submitBtn.disabled = on; submitBtn.classList.toggle('is-loading', on); } }
+
+    function showSuccess() {
+      if (formState) formState.hidden = true;
+      if (successState) { successState.hidden = false; }
+      var h = successState && successState.querySelector('.rpopup__heading');
+      if (h) { h.setAttribute('tabindex', '-1'); try { h.focus(); } catch (e) {} }
+    }
+
+    if (closeBtn) closeBtn.addEventListener('click', close);
+    if (overlay) overlay.addEventListener('click', close);
+
+    if (form) {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        clearError();
+        var name = form.querySelector('[name="contact[first_name]"]');
+        var email = form.querySelector('[name="contact[email]"]');
+        if (name && !name.value.trim()) { showError('Please enter your first name.'); name.focus(); return; }
+        if (!email || !EMAIL_RE.test(email.value.trim())) {
+          showError('Please enter a valid email address.');
+          if (email) email.focus();
+          return;
+        }
+        if (designMode) { showSuccess(); return; } // never post test data from the editor
+
+        loading(true);
+        fetch(form.action, {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { 'Accept': 'application/json, text/html' }
+        }).then(function () {
+          showSuccess();
+        }).catch(function () {
+          showError('Something went wrong. Please try again.');
+        }).then(function () {
+          loading(false);
+        });
+      });
+    }
+
+    if (copyBtn) {
+      copyBtn.addEventListener('click', function () {
+        var codeVal = copyBtn.getAttribute('data-code') || '';
+        var done = function () {
+          copyBtn.classList.add('is-copied');
+          if (copiedMsg) copiedMsg.hidden = false;
+          setTimeout(function () {
+            copyBtn.classList.remove('is-copied');
+            if (copiedMsg) copiedMsg.hidden = true;
+          }, 2200);
+        };
+        var fallback = function () {
+          var ta = document.createElement('textarea');
+          ta.value = codeVal; ta.setAttribute('readonly', '');
+          ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta); ta.select();
+          try { document.execCommand('copy'); done(); } catch (e) {}
+          document.body.removeChild(ta);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(codeVal).then(done).catch(fallback);
+        } else { fallback(); }
+      });
+    }
+
+    // Trigger
+    if (!designMode && !seen()) {
+      timer = window.setTimeout(open, delay * 1000);
+    }
+
+    // Theme editor preview
+    document.addEventListener('shopify:section:select', function (e) {
+      if (e.target && e.target.contains(root)) open();
+    });
+    document.addEventListener('shopify:section:deselect', function () {
+      if (designMode) close();
+    });
+  }
+
+  function boot() {
+    var nodes = document.querySelectorAll('[data-rpopup]');
+    Array.prototype.forEach.call(nodes, init);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+})();
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Popup — Discount",
+  "tag": "section",
+  "class": "section-popup-discount",
+  "enabled_on": { "templates": ["index"] },
+  "settings": [
+    { "type": "paragraph", "content": "Captures subscribers into Shopify Customers + Email Marketing via the native customer form. Create the matching discount code under Discounts so it works at checkout." },
+    { "type": "checkbox", "id": "enable", "label": "Enable popup", "default": true },
+    { "type": "range", "id": "delay_seconds", "label": "Show after (delay)", "min": 0, "max": 30, "step": 1, "unit": "s", "default": 5 },
+    { "type": "range", "id": "frequency_days", "label": "Show again after", "info": "Won't reappear for this many days per visitor. Set 0 to show every visit.", "min": 0, "max": 30, "step": 1, "unit": "d", "default": 7 },
+
+    { "type": "header", "content": "Content" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "🎉 Get 10% Off Your First Order" },
+    { "type": "textarea", "id": "description", "label": "Description", "default": "Join our community and receive an exclusive discount code instantly." },
+    { "type": "text", "id": "button_label", "label": "Button text", "default": "Get My Discount" },
+
+    { "type": "header", "content": "Form Fields" },
+    { "type": "text", "id": "firstname_label", "label": "First name label", "default": "First Name" },
+    { "type": "text", "id": "email_label", "label": "Email label", "default": "Email Address" },
+    { "type": "checkbox", "id": "show_phone", "label": "Show phone field", "default": true },
+    { "type": "text", "id": "phone_label", "label": "Phone label", "default": "Phone Number" },
+    { "type": "text", "id": "consent_text", "label": "Consent / fine print (optional)", "default": "By subscribing you agree to receive marketing emails." },
+
+    { "type": "header", "content": "Success State" },
+    { "type": "text", "id": "discount_code", "label": "Discount code", "default": "WELCOME10" },
+    { "type": "text", "id": "success_heading", "label": "Success heading", "default": "🎉 Your Discount is Ready!" },
+    { "type": "textarea", "id": "success_message", "label": "Success message", "info": "Use [code] to insert the discount code.", "default": "Use code [code] at checkout to get 10% off your first order." },
+    { "type": "text", "id": "copy_label", "label": "Copy button text", "default": "Copy Discount Code" },
+
+    { "type": "header", "content": "Image (optional)" },
+    { "type": "image_picker", "id": "image", "label": "Side image" },
+
+    { "type": "header", "content": "Colors & Style" },
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#FFFFFF" },
+    { "type": "color", "id": "text_color", "label": "Text", "default": "#2C2C2A" },
+    { "type": "color", "id": "heading_color", "label": "Heading", "default": "#1C3557" },
+    { "type": "color", "id": "button_color", "label": "Button / primary", "default": "#1C3557" },
+    { "type": "color", "id": "button_text_color", "label": "Button text", "default": "#FFFFFF" },
+    { "type": "color", "id": "overlay_color", "label": "Overlay", "default": "#0F1F33" },
+    { "type": "range", "id": "overlay_opacity", "label": "Overlay opacity", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 60 },
+    { "type": "range", "id": "border_radius", "label": "Corner radius", "min": 0, "max": 32, "step": 2, "unit": "px", "default": 16 }
+  ],
+  "presets": [{ "name": "Popup — Discount" }]
+}
+{% endschema %}
