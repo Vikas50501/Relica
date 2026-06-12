@@ -21,6 +21,7 @@
         role="group"
         aria-roledescription="slide"
         aria-label="Slide {{ forloop.index }} of {{ section.blocks.size }}"
+        style="--slide-overlay:{{ block.settings.overlay_color | default: '#1C3557' }};"
         {{ block.shopify_attributes }}>
 
         <div class="slide-bg">
@@ -163,6 +164,26 @@
 
 
 <style>
+/* ── Hero CTA buttons — primary uses each slide's overlay color ── */
+.hero .slide-ctas .btn-primary {
+  background: var(--slide-overlay, var(--navy));
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  transition: filter 0.2s ease, border-color 0.2s ease;
+}
+.hero .slide-ctas .btn-primary:hover {
+  background: var(--slide-overlay, var(--navy));
+  filter: brightness(1.18);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+.hero .slide-ctas .btn-ghost {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+.hero .slide-ctas .btn-primary,
+.hero .slide-ctas .btn-ghost {
+  min-width: 184px;
+  text-align: center;
+}
+
 /* ── Product slider wrapper ── */
 .prod-slider {
   position: absolute;
