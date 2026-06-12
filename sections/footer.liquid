@@ -54,6 +54,33 @@
       {%- endfor -%}
     </div>
 
+    {%- if section.settings.show_newsletter -%}
+      <div class="footer-newsletter">
+        <div class="fn-text">
+          <h4 class="fn-title">{{ section.settings.newsletter_title }}</h4>
+          {%- if section.settings.newsletter_subtitle != blank -%}
+            <p class="fn-sub">{{ section.settings.newsletter_subtitle }}</p>
+          {%- endif -%}
+        </div>
+        <form class="fn-form"
+          id="footerNewsletter"
+          data-endpoint="{{ section.settings.newsletter_endpoint }}"
+          novalidate>
+          <div class="fn-row">
+            <input type="email"
+              name="email"
+              class="fn-input"
+              placeholder="{{ section.settings.newsletter_placeholder }}"
+              autocomplete="email"
+              required
+              aria-label="Email address">
+            <button type="submit" class="fn-btn">{{ section.settings.newsletter_button }}</button>
+          </div>
+          <p class="fn-msg" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    {%- endif -%}
+
     <div class="footer-bottom">
       <span>{{ section.settings.copyright }}</span>
       <div class="footer-legal">
@@ -64,6 +91,105 @@
     </div>
   </div>
 </footer>
+
+<style>
+  .footer-newsletter{
+    display:flex;justify-content:space-between;align-items:center;
+    gap:40px;flex-wrap:wrap;
+    padding-bottom:32px;margin-bottom:28px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .footer-newsletter .fn-title{
+    font-family:var(--font-display);font-size:24px;font-weight:300;
+    color:#fff;margin:0 0 6px;
+  }
+  .footer-newsletter .fn-sub{
+    font-size:13px;line-height:1.7;color:rgba(255,255,255,.5);
+    font-weight:300;margin:0;max-width:440px;
+  }
+  .fn-form{min-width:min(440px,100%);flex:0 1 auto;}
+  .fn-row{display:flex;align-items:stretch;}
+  .fn-input{
+    flex:1;min-width:0;background:transparent;
+    border:1px solid rgba(255,255,255,.2);border-right:none;
+    color:#fff;padding:14px 16px;font-size:14px;
+    font-family:var(--font-body);outline:none;transition:border-color .2s;
+  }
+  .fn-input::placeholder{color:rgba(255,255,255,.4);}
+  .fn-input:focus{border-color:var(--rose-mid);}
+  .fn-btn{
+    background:var(--rose-mid);color:var(--navy-deep);border:none;
+    padding:14px 28px;font-size:12px;letter-spacing:.12em;
+    text-transform:uppercase;font-weight:600;cursor:pointer;
+    font-family:var(--font-body);transition:background .2s;white-space:nowrap;
+  }
+  .fn-btn:hover{background:#fff;}
+  .fn-btn:disabled{opacity:.6;cursor:default;}
+  .fn-msg{font-size:12px;margin:10px 0 0;min-height:1em;font-weight:300;}
+  .fn-msg.ok{color:var(--rose-mid);}
+  .fn-msg.err{color:#ff9b9b;}
+  @media(max-width:768px){
+    .footer-newsletter{flex-direction:column;align-items:flex-start;}
+    .fn-form{width:100%;}
+  }
+</style>
+
+<script>
+(function(){
+  var form = document.getElementById('footerNewsletter');
+  if (!form) return;
+
+  var input = form.querySelector('.fn-input');
+  var btn   = form.querySelector('.fn-btn');
+  var msg   = form.querySelector('.fn-msg');
+  var endpoint = form.dataset.endpoint;
+  var EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    var email = (input.value || '').trim();
+    msg.className = 'fn-msg';
+
+    if (!EMAIL_RE.test(email)) {
+      msg.textContent = 'Please enter a valid email address.';
+      msg.classList.add('err');
+      return;
+    }
+
+    if (!endpoint) {
+      msg.textContent = 'Newsletter is not configured yet.';
+      msg.classList.add('err');
+      return;
+    }
+
+    var original = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '…';
+
+    var data = new URLSearchParams();
+    data.append('email', email);
+    data.append('source', window.location.hostname);
+
+    // Google Apps Script web apps don't send CORS headers, so we POST
+    // with no-cors (opaque response) — the row is still written to the sheet.
+    fetch(endpoint, { method: 'POST', mode: 'no-cors', body: data })
+      .then(function () {
+        msg.textContent = 'Thanks for subscribing!';
+        msg.classList.add('ok');
+        form.reset();
+      })
+      .catch(function () {
+        msg.textContent = 'Something went wrong. Please try again.';
+        msg.classList.add('err');
+      })
+      .finally(function () {
+        btn.disabled = false;
+        btn.textContent = original;
+      });
+  });
+})();
+</script>
 
 {% schema %}
 {
@@ -79,6 +205,13 @@
     { "type": "text", "id": "address", "label": "Address" },
     { "type": "text", "id": "phone", "label": "Phone" },
     { "type": "text", "id": "email", "label": "Email" },
+    { "type": "header", "content": "Newsletter" },
+    { "type": "checkbox", "id": "show_newsletter", "label": "Show newsletter signup", "default": true },
+    { "type": "text", "id": "newsletter_title", "label": "Heading", "default": "Join the Relica family" },
+    { "type": "textarea", "id": "newsletter_subtitle", "label": "Subtext", "default": "Subscribe for new launches, exclusive offers, and culinary inspiration." },
+    { "type": "text", "id": "newsletter_placeholder", "label": "Input placeholder", "default": "Enter your email" },
+    { "type": "text", "id": "newsletter_button", "label": "Button label", "default": "Subscribe" },
+    { "type": "text", "id": "newsletter_endpoint", "label": "Google Sheet endpoint URL", "info": "Paste the /exec Web App URL from your Google Apps Script deployment (see setup steps). Emails submitted in the footer are appended to your sheet." },
     { "type": "header", "content": "Legal" },
     { "type": "text", "id": "copyright", "label": "Copyright text", "default": "© 2026 Relica Innovations Pvt. Ltd. All rights reserved." },
     { "type": "url", "id": "privacy_url", "label": "Privacy Policy URL" },
