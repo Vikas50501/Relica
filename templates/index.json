@@ -798,6 +798,36 @@
       "disabled": true,
       "name": "Contact ",
       "settings": {}
+    },
+    "popup_discount_UABcYx": {
+      "type": "popup-discount",
+      "name": "Popup — Discount",
+      "settings": {
+        "enable": true,
+        "delay_seconds": 5,
+        "frequency_days": 2,
+        "heading": "🎉 Get 10% Off Your First Order",
+        "description": "Join our community and receive an exclusive discount code instantly.",
+        "button_label": "Get My Discount",
+        "firstname_label": "First Name",
+        "email_label": "Email Address",
+        "show_phone": true,
+        "phone_label": "Phone Number",
+        "consent_text": "By subscribing you agree to receive marketing emails.",
+        "discount_code": "WELCOME10",
+        "success_heading": "🎉 Your Discount is Ready!",
+        "success_message": "Use code [code] at checkout to get 10% off your first order.",
+        "copy_label": "Copy Discount Code",
+        "image": "shopify://shop_images/2_59500bf6-612c-456a-b4cd-128899b3defa.jpg",
+        "bg_color": "#FFFFFF",
+        "text_color": "#2C2C2A",
+        "heading_color": "#1C3557",
+        "button_color": "#1C3557",
+        "button_text_color": "#FFFFFF",
+        "overlay_color": "#0F1F33",
+        "overlay_opacity": 60,
+        "border_radius": 16
+      }
     }
   },
   "order": [
@@ -811,6 +841,7 @@
     "series_tabs",
     "cooktop_compat",
     "cta_banner",
-    "17799549994a534131"
+    "17799549994a534131",
+    "popup_discount_UABcYx"
   ]
 }
