@@ -814,7 +814,7 @@
         "show_phone": true,
         "phone_label": "Phone Number",
         "consent_text": "By subscribing you agree to receive marketing emails.",
-        "sheet_endpoint": "https://script.google.com/macros/s/AKfycbxCNQrLcJhl2FP68B5gWWssz5WyDNoQnyB2fLgBG6uD6_EPnMAP_CVRHhKeCGH8hAOgYA/exec",
+        "sheet_endpoint": "https://script.google.com/macros/s/AKfycbyR5Kf_gGsO3hvbLuz7DXedG74zMO7nVI9gETF6EsY4B_ZaKjdCJxkMCvq5nvKELgPD6w/exec",
         "discount_code": "WELCOME10",
         "success_heading": "🎉 Your Discount is Ready!",
         "success_message": "Use code [code] at checkout to get 10% off your first order.",
