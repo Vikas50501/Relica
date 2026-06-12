@@ -23,6 +23,7 @@
     data-delay="{{ section.settings.delay_seconds }}"
     data-days="{{ section.settings.frequency_days }}"
     data-storage-key="rpopup-{{ section.id }}"
+    data-sheet-endpoint="{{ section.settings.sheet_endpoint }}"
     style="
       --rp-bg:{{ section.settings.bg_color }};
       --rp-text:{{ section.settings.text_color }};
@@ -310,6 +311,7 @@
     var delay = parseInt(root.dataset.delay, 10); if (isNaN(delay)) delay = 5;
     var days = parseInt(root.dataset.days, 10); if (isNaN(days)) days = 7;
     var storageKey = root.dataset.storageKey || 'rpopup';
+    var sheetEndpoint = (root.dataset.sheetEndpoint || '').trim();
     var designMode = !!(window.Shopify && window.Shopify.designMode);
     var EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
     var lastFocus = null;
@@ -391,6 +393,23 @@
         if (designMode) { showSuccess(); return; } // never post test data from the editor
 
         loading(true);
+
+        // Optional: also save to a Google Sheet (Apps Script web app).
+        // Google Apps Script doesn't send CORS headers, so this is a
+        // fire-and-forget no-cors POST with clean field names.
+        if (sheetEndpoint) {
+          var phone = form.querySelector('[name="contact[phone]"]');
+          var sheetData = new URLSearchParams();
+          sheetData.append('first_name', name ? name.value.trim() : '');
+          sheetData.append('email', email.value.trim());
+          sheetData.append('phone', phone ? phone.value.trim() : '');
+          sheetData.append('source', window.location.hostname);
+          try {
+            fetch(sheetEndpoint, { method: 'POST', mode: 'no-cors', body: sheetData });
+          } catch (e) {}
+        }
+
+        // Primary: register the subscriber in Shopify (Customers + Email Marketing).
         fetch(form.action, {
           method: 'POST',
           body: new FormData(form),
@@ -479,6 +498,10 @@
     { "type": "checkbox", "id": "show_phone", "label": "Show phone field", "default": true },
     { "type": "text", "id": "phone_label", "label": "Phone label", "default": "Phone Number" },
     { "type": "text", "id": "consent_text", "label": "Consent / fine print (optional)", "default": "By subscribing you agree to receive marketing emails." },
+
+    { "type": "header", "content": "Google Sheet (optional)" },
+    { "type": "paragraph", "content": "Paste your Google Apps Script Web app /exec URL to also save each submission (incl. phone) to a Google Sheet. Deploy the script as a Web app with access set to Anyone. Leave blank to skip." },
+    { "type": "text", "id": "sheet_endpoint", "label": "Apps Script Web app URL", "info": "e.g. https://script.google.com/macros/s/XXXX/exec" },
 
     { "type": "header", "content": "Success State" },
     { "type": "text", "id": "discount_code", "label": "Discount code", "default": "WELCOME10" },
