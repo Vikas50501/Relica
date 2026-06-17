@@ -337,11 +337,16 @@
       </a>
     </div>
 
+    {%- comment -%} Warranty metafield (specs.warranty or default custom.warranty namespace). Read early so the
+        trust strip can show each product's actual warranty duration instead of a fixed label. {%- endcomment -%}
+    {%- assign warranty_data = product.metafields.specs.warranty.value -%}
+    {%- if warranty_data == blank -%}{%- assign warranty_data = product.metafields.custom.warranty.value -%}{%- endif -%}
+
     {%- comment -%} Trust strip {%- endcomment -%}
     <div class="prod-trust-strip">
       <div class="prod-trust-item">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        <span>{{ section.settings.trust1 | default: 'Up to 5-Year Warranty' }}</span>
+        <span data-warranty-badge>{%- if warranty_data.duration != blank -%}{{ warranty_data.duration }} Warranty{%- else -%}{{ section.settings.trust1 | default: 'Up to 5-Year Warranty' }}{%- endif -%}</span>
       </div>
       <div class="prod-trust-item">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
@@ -360,10 +365,6 @@
     {%- comment -%} ── ACCORDION TABS (Description / Specifications / Compatibility / Shipping) ── {%- endcomment -%}
     {%- comment -%} Specifications come from a single JSON metafield (specs.table). Empty metafield ⇒ no tab, no panel. {%- endcomment -%}
     {%- assign specs_data = product.metafields.specs.table.value -%}
-    {%- comment -%} Warranty comes from a JSON metafield (per series). Look in both the `specs` and the
-        default `custom` namespace so it works regardless of which the merchant used. Empty ⇒ no tab/panel. {%- endcomment -%}
-    {%- assign warranty_data = product.metafields.specs.warranty.value -%}
-    {%- if warranty_data == blank -%}{%- assign warranty_data = product.metafields.custom.warranty.value -%}{%- endif -%}
     <div class="prod-tabs" role="tablist">
       <div class="prod-tab-list">
         <button class="prod-tab active" role="tab" aria-selected="true" data-tab="description" onclick="prodOpenTab('description')">Description</button>
@@ -927,6 +928,11 @@
     }
 
     var duration   = pick('duration', 'period', 'term');
+    // Keep the top trust-strip badge in sync with the actual warranty duration.
+    if (duration && String(duration).trim()) {
+      var badge = document.querySelector('[data-warranty-badge]');
+      if (badge) badge.textContent = String(duration).trim() + ' Warranty';
+    }
     var summary    = pick('summary', 'description', 'intro');
     var coverage   = pick('coverage', 'covered', 'whatscovered');
     var conditions = toList(pick('conditions', 'condition', 'terms'));
