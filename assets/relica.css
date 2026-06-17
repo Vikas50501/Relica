@@ -583,6 +583,19 @@ footer{background:var(--navy-deep);color:rgba(255,255,255,.55);padding:64px 40px
   .prod-specs-table td:first-child{width:100%;padding-right:0;margin-bottom:2px}
 }
 
+/* PRODUCT WARRANTY BLOCK */
+.prod-warranty{font-size:13px;color:var(--mid-gray);line-height:1.55}
+.prod-warranty-badge{display:inline-flex;align-items:baseline;gap:8px;padding:8px 16px;border:1px solid var(--navy);color:var(--navy);margin-bottom:18px}
+.prod-warranty-badge-num{font-size:20px;font-weight:600;letter-spacing:.02em}
+.prod-warranty-badge-label{font-size:11px;text-transform:uppercase;letter-spacing:.12em}
+.prod-warranty-summary{margin-bottom:16px;color:var(--navy)}
+.prod-warranty-h{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--navy);font-weight:600;margin:18px 0 8px}
+.prod-warranty-text{margin-bottom:8px}
+.prod-warranty-list{list-style:none;margin:0 0 8px;padding:0}
+.prod-warranty-list li{position:relative;padding-left:18px;margin-bottom:6px}
+.prod-warranty-list li::before{content:"✓";position:absolute;left:0;color:var(--navy);font-weight:600}
+.prod-warranty-list--excl li::before{content:"×";color:var(--mid-gray)}
+
 /* LIGHTBOX */
 .prod-lightbox{position:fixed;inset:0;background:rgba(15,31,51,.94);z-index:999;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(4px)}
 .prod-lightbox--open{opacity:1;pointer-events:all}

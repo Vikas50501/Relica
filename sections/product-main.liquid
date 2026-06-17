@@ -360,11 +360,16 @@
     {%- comment -%} ── ACCORDION TABS (Description / Specifications / Compatibility / Shipping) ── {%- endcomment -%}
     {%- comment -%} Specifications come from a single JSON metafield (specs.table). Empty metafield ⇒ no tab, no panel. {%- endcomment -%}
     {%- assign specs_data = product.metafields.specs.table.value -%}
+    {%- comment -%} Warranty comes from the specs.warranty JSON metafield (per series). Empty ⇒ no tab, no panel. {%- endcomment -%}
+    {%- assign warranty_data = product.metafields.specs.warranty.value -%}
     <div class="prod-tabs" role="tablist">
       <div class="prod-tab-list">
         <button class="prod-tab active" role="tab" aria-selected="true" data-tab="description" onclick="prodOpenTab('description')">Description</button>
         {%- if section.settings.show_specs and specs_data != blank -%}
           <button class="prod-tab" role="tab" aria-selected="false" data-tab="specs" onclick="prodOpenTab('specs')">Specifications</button>
+        {%- endif -%}
+        {%- if section.settings.show_warranty and warranty_data != blank -%}
+          <button class="prod-tab" role="tab" aria-selected="false" data-tab="warranty" onclick="prodOpenTab('warranty')">Warranty</button>
         {%- endif -%}
         {%- if section.settings.show_compat -%}
           <button class="prod-tab" role="tab" aria-selected="false" data-tab="compat" onclick="prodOpenTab('compat')">Compatibility</button>
@@ -401,6 +406,50 @@
             <script type="application/json" data-specs-json>
               {{- specs_data | json -}}
             </script>
+          </div>
+        </div>
+      {%- endif -%}
+
+      {%- comment -%}
+        Warranty — dynamic, per-product from the `specs.warranty` JSON metafield (type: JSON).
+        Each series carries its own terms; nothing is hardcoded. Empty fields are skipped,
+        and an empty metafield removes the whole tab/panel (handled above + below).
+        Expected JSON shape (all keys optional):
+        { "duration": "2 Years", "summary": "...", "coverage": "...",
+          "conditions": ["..."], "exclusions": ["..."] }
+      {%- endcomment -%}
+      {%- if section.settings.show_warranty and warranty_data != blank -%}
+        <div class="prod-tab-panel" id="tabpanel-warranty" role="tabpanel" style="display:none;">
+          <div class="prod-tab-body prod-warranty">
+            {%- if warranty_data.duration != blank -%}
+              <div class="prod-warranty-badge">
+                <span class="prod-warranty-badge-num">{{ warranty_data.duration }}</span>
+                <span class="prod-warranty-badge-label">Warranty</span>
+              </div>
+            {%- endif -%}
+            {%- if warranty_data.summary != blank -%}
+              <p class="prod-warranty-summary">{{ warranty_data.summary }}</p>
+            {%- endif -%}
+            {%- if warranty_data.coverage != blank -%}
+              <h4 class="prod-warranty-h">What's covered</h4>
+              <p class="prod-warranty-text">{{ warranty_data.coverage }}</p>
+            {%- endif -%}
+            {%- if warranty_data.conditions != blank -%}
+              <h4 class="prod-warranty-h">Warranty conditions</h4>
+              <ul class="prod-warranty-list">
+                {%- for item in warranty_data.conditions -%}
+                  {%- if item != blank -%}<li>{{ item }}</li>{%- endif -%}
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+            {%- if warranty_data.exclusions != blank -%}
+              <h4 class="prod-warranty-h">Not covered under warranty</h4>
+              <ul class="prod-warranty-list prod-warranty-list--excl">
+                {%- for item in warranty_data.exclusions -%}
+                  {%- if item != blank -%}<li>{{ item }}</li>{%- endif -%}
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
           </div>
         </div>
       {%- endif -%}
@@ -946,6 +995,7 @@
     { "type": "checkbox", "id": "show_sku", "label": "Show SKU", "default": true },
     { "type": "checkbox", "id": "show_buy_now", "label": "Show Buy Now button", "default": true },
     { "type": "checkbox", "id": "show_specs", "label": "Show Specifications tab", "default": true },
+    { "type": "checkbox", "id": "show_warranty", "label": "Show Warranty tab (needs specs.warranty metafield)", "default": true },
     { "type": "checkbox", "id": "show_compat", "label": "Show Compatibility tab", "default": true },
     { "type": "checkbox", "id": "show_shipping", "label": "Show Shipping & Returns tab", "default": true },
     { "type": "checkbox", "id": "show_reviews", "label": "Show Reviews tab", "default": true },

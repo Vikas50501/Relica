@@ -10,6 +10,7 @@
         "show_sku": true,
         "show_buy_now": true,
         "show_specs": true,
+        "show_warranty": true,
         "show_compat": true,
         "show_shipping": true,
         "show_reviews": true,
