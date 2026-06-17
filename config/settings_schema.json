@@ -176,7 +176,7 @@
         ]
       },
       { "type": "checkbox", "id": "cart_show_note", "label": "Show order note field", "default": true },
-      { "type": "text", "id": "cart_free_shipping_threshold", "label": "Free shipping threshold (₹)", "default": "999" },
+      { "type": "text", "id": "cart_free_shipping_threshold", "label": "Free shipping threshold (₹)", "default": "1000" },
       { "type": "checkbox", "id": "cart_show_recommendations", "label": "Show product recommendations in cart", "default": true },
       { "type": "text", "id": "cart_recommendations_title", "label": "Recommendations heading", "default": "You may also like" }
     ]
@@ -200,7 +200,7 @@
       { "type": "checkbox", "id": "product_show_quantity", "label": "Show quantity selector", "default": true },
       { "type": "header", "content": "Trust Badges" },
       { "type": "checkbox", "id": "product_show_trust", "label": "Show trust badges on product page", "default": true },
-      { "type": "text", "id": "product_trust_1", "label": "Trust badge 1", "default": "✓ Free shipping above ₹999" },
+      { "type": "text", "id": "product_trust_1", "label": "Trust badge 1", "default": "✓ Free shipping over ₹1000" },
       { "type": "text", "id": "product_trust_2", "label": "Trust badge 2", "default": "✓ ISI Certified & PFOA Free" },
       { "type": "text", "id": "product_trust_3", "label": "Trust badge 3", "default": "✓ 30-day return policy" },
       { "type": "text", "id": "product_trust_4", "label": "Trust badge 4", "default": "✓ Secure checkout" }
