@@ -585,6 +585,7 @@ footer{background:var(--navy-deep);color:rgba(255,255,255,.55);padding:64px 40px
 
 /* PRODUCT WARRANTY BLOCK */
 .prod-warranty{font-size:13px;color:var(--mid-gray);line-height:1.55}
+.prod-warranty[hidden]{display:none}
 .prod-warranty-badge{display:inline-flex;align-items:baseline;gap:8px;padding:8px 16px;border:1px solid var(--navy);color:var(--navy);margin-bottom:18px}
 .prod-warranty-badge-num{font-size:20px;font-weight:600;letter-spacing:.02em}
 .prod-warranty-badge-label{font-size:11px;text-transform:uppercase;letter-spacing:.12em}

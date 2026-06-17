@@ -360,8 +360,10 @@
     {%- comment -%} ── ACCORDION TABS (Description / Specifications / Compatibility / Shipping) ── {%- endcomment -%}
     {%- comment -%} Specifications come from a single JSON metafield (specs.table). Empty metafield ⇒ no tab, no panel. {%- endcomment -%}
     {%- assign specs_data = product.metafields.specs.table.value -%}
-    {%- comment -%} Warranty comes from the specs.warranty JSON metafield (per series). Empty ⇒ no tab, no panel. {%- endcomment -%}
+    {%- comment -%} Warranty comes from a JSON metafield (per series). Look in both the `specs` and the
+        default `custom` namespace so it works regardless of which the merchant used. Empty ⇒ no tab/panel. {%- endcomment -%}
     {%- assign warranty_data = product.metafields.specs.warranty.value -%}
+    {%- if warranty_data == blank -%}{%- assign warranty_data = product.metafields.custom.warranty.value -%}{%- endif -%}
     <div class="prod-tabs" role="tablist">
       <div class="prod-tab-list">
         <button class="prod-tab active" role="tab" aria-selected="true" data-tab="description" onclick="prodOpenTab('description')">Description</button>
@@ -411,46 +413,20 @@
       {%- endif -%}
 
       {%- comment -%}
-        Warranty — dynamic, per-product from the `specs.warranty` JSON metafield (type: JSON).
-        Each series carries its own terms; nothing is hardcoded. Empty fields are skipped,
-        and an empty metafield removes the whole tab/panel (handled above + below).
+        Warranty — dynamic, per-product. Liquid emits the JSON metafield (from specs.warranty or
+        custom.warranty); JavaScript parses and renders it. This tolerates either a JSON-typed
+        metafield or a text metafield holding a JSON string. Empty fields are skipped; an empty
+        metafield removes the whole tab/panel.
         Expected JSON shape (all keys optional):
         { "duration": "2 Years", "summary": "...", "coverage": "...",
           "conditions": ["..."], "exclusions": ["..."] }
       {%- endcomment -%}
       {%- if section.settings.show_warranty and warranty_data != blank -%}
         <div class="prod-tab-panel" id="tabpanel-warranty" role="tabpanel" style="display:none;">
-          <div class="prod-tab-body prod-warranty">
-            {%- if warranty_data.duration != blank -%}
-              <div class="prod-warranty-badge">
-                <span class="prod-warranty-badge-num">{{ warranty_data.duration }}</span>
-                <span class="prod-warranty-badge-label">Warranty</span>
-              </div>
-            {%- endif -%}
-            {%- if warranty_data.summary != blank -%}
-              <p class="prod-warranty-summary">{{ warranty_data.summary }}</p>
-            {%- endif -%}
-            {%- if warranty_data.coverage != blank -%}
-              <h4 class="prod-warranty-h">What's covered</h4>
-              <p class="prod-warranty-text">{{ warranty_data.coverage }}</p>
-            {%- endif -%}
-            {%- if warranty_data.conditions != blank -%}
-              <h4 class="prod-warranty-h">Warranty conditions</h4>
-              <ul class="prod-warranty-list">
-                {%- for item in warranty_data.conditions -%}
-                  {%- if item != blank -%}<li>{{ item }}</li>{%- endif -%}
-                {%- endfor -%}
-              </ul>
-            {%- endif -%}
-            {%- if warranty_data.exclusions != blank -%}
-              <h4 class="prod-warranty-h">Not covered under warranty</h4>
-              <ul class="prod-warranty-list prod-warranty-list--excl">
-                {%- for item in warranty_data.exclusions -%}
-                  {%- if item != blank -%}<li>{{ item }}</li>{%- endif -%}
-                {%- endfor -%}
-              </ul>
-            {%- endif -%}
-          </div>
+          <div class="prod-tab-body prod-warranty" data-warranty hidden></div>
+          <script type="application/json" data-warranty-json>
+            {{- warranty_data | json -}}
+          </script>
         </div>
       {%- endif -%}
 
@@ -912,6 +888,75 @@
       return s.replace(/[&<>"']/g, function(c) {
         return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
       });
+    }
+  })();
+
+  /* ── WARRANTY (dynamic from JSON metafield) ── */
+  (function renderWarranty() {
+    var src = document.querySelector('[data-warranty-json]');
+    var box = document.querySelector('[data-warranty]');
+    if (!src || !box) return;
+
+    // Parse — tolerate a JSON-typed metafield or a text metafield holding a JSON string.
+    var data;
+    try {
+      data = JSON.parse(src.textContent);
+      if (typeof data === 'string') { data = JSON.parse(data); }
+    } catch (e) { data = null; }
+    if (!data || typeof data !== 'object') return;
+
+    // Case-insensitive key lookup, tolerant of a few synonyms.
+    function pick() {
+      var keys = Object.keys(data);
+      for (var a = 0; a < arguments.length; a++) {
+        for (var k = 0; k < keys.length; k++) {
+          if (keys[k].toLowerCase().replace(/[\s_-]/g, '') === arguments[a]) return data[keys[k]];
+        }
+      }
+      return null;
+    }
+    function esc(s) {
+      return String(s).replace(/[&<>"']/g, function(c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+    function toList(v) {
+      if (Array.isArray(v)) return v;
+      if (v == null || v === '') return [];
+      return [v];
+    }
+
+    var duration   = pick('duration', 'period', 'term');
+    var summary    = pick('summary', 'description', 'intro');
+    var coverage   = pick('coverage', 'covered', 'whatscovered');
+    var conditions = toList(pick('conditions', 'condition', 'terms'));
+    var exclusions = toList(pick('exclusions', 'exclusion', 'notcovered', 'excluded'));
+
+    var html = '';
+    if (duration && String(duration).trim()) {
+      html += '<div class="prod-warranty-badge"><span class="prod-warranty-badge-num">' +
+        esc(String(duration).trim()) + '</span><span class="prod-warranty-badge-label">Warranty</span></div>';
+    }
+    if (summary && String(summary).trim()) {
+      html += '<p class="prod-warranty-summary">' + esc(String(summary).trim()) + '</p>';
+    }
+    if (coverage && String(coverage).trim()) {
+      html += '<h4 class="prod-warranty-h">What\'s covered</h4><p class="prod-warranty-text">' +
+        esc(String(coverage).trim()) + '</p>';
+    }
+    function listBlock(title, items, extraClass) {
+      var li = items.map(function(i) { return String(i).trim(); }).filter(Boolean)
+        .map(function(i) { return '<li>' + esc(i) + '</li>'; }).join('');
+      if (!li) return '';
+      return '<h4 class="prod-warranty-h">' + title + '</h4><ul class="prod-warranty-list' +
+        (extraClass || '') + '">' + li + '</ul>';
+    }
+    html += listBlock('Warranty conditions', conditions, '');
+    html += listBlock('Not covered under warranty', exclusions, ' prod-warranty-list--excl');
+
+    if (html) {
+      box.innerHTML = html;
+      box.hidden = false;
     }
   })();
 
