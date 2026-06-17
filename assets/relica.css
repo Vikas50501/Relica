@@ -570,9 +570,18 @@ footer{background:var(--navy-deep);color:rgba(255,255,255,.55);padding:64px 40px
 .prod-tab-body ul,.prod-tab-body ol{padding-left:20px;margin-bottom:14px}
 .prod-tab-body li{margin-bottom:5px}
 .prod-specs-table{width:100%;border-collapse:collapse}
-.prod-specs-table td{padding:10px 0;border-bottom:1px solid var(--light-gray);font-size:13px;vertical-align:top}
-.prod-specs-table td:first-child{width:40%;color:var(--navy);font-weight:500;padding-right:16px;letter-spacing:.04em}
-.prod-specs-table td:last-child{color:var(--mid-gray)}
+.prod-specs-table[hidden]{display:none}
+.prod-specs-table td{padding:14px 0;border-bottom:1px solid var(--light-gray);font-size:13px;vertical-align:top;line-height:1.45}
+.prod-specs-table tr:last-child td{border-bottom:0}
+.prod-specs-table td:first-child{width:40%;color:var(--navy);font-weight:500;padding-right:24px;letter-spacing:.04em}
+.prod-specs-table td:last-child{color:var(--mid-gray);word-break:break-word}
+@media(max-width:560px){
+  .prod-specs-table,.prod-specs-table tbody,.prod-specs-table tr,.prod-specs-table td{display:block;width:100%}
+  .prod-specs-table tr{padding:12px 0;border-bottom:1px solid var(--light-gray)}
+  .prod-specs-table tr:last-child{border-bottom:0}
+  .prod-specs-table td{padding:2px 0;border-bottom:0}
+  .prod-specs-table td:first-child{width:100%;padding-right:0;margin-bottom:2px}
+}
 
 /* LIGHTBOX */
 .prod-lightbox{position:fixed;inset:0;background:rgba(15,31,51,.94);z-index:999;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(4px)}
@@ -1071,10 +1080,7 @@ input[type=range].col-price-thumb::-webkit-slider-runnable-track{background:tran
 .prod-acc-content ul,.prod-acc-content ol{padding-left:18px;margin-bottom:10px;font-size:14px;color:var(--mid-gray);line-height:1.7}
 .prod-acc-content li{margin-bottom:4px}
 
-/* Specs table */
-.prod-specs-table{width:100%;border-collapse:collapse;font-size:13px}
-.prod-specs-table th{width:40%;text-align:left;color:var(--navy);font-weight:600;padding:10px 12px 10px 0;border-bottom:1px solid var(--light-gray);letter-spacing:.04em;font-size:12px;text-transform:uppercase;vertical-align:top}
-.prod-specs-table td{color:var(--mid-gray);padding:10px 0;border-bottom:1px solid var(--light-gray);vertical-align:top}
+/* Specs table styling lives in the "PRODUCT SPECS TABLE" block above (single source). */
 
 /* ── Lightbox ── */
 .prod-lightbox{position:fixed;inset:0;background:rgba(10,18,30,.95);z-index:999;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(6px)}

@@ -358,10 +358,12 @@
     </div>
 
     {%- comment -%} ── ACCORDION TABS (Description / Specifications / Compatibility / Shipping) ── {%- endcomment -%}
+    {%- comment -%} Specifications come from a single JSON metafield (specs.table). Empty metafield ⇒ no tab, no panel. {%- endcomment -%}
+    {%- assign specs_data = product.metafields.specs.table.value -%}
     <div class="prod-tabs" role="tablist">
       <div class="prod-tab-list">
         <button class="prod-tab active" role="tab" aria-selected="true" data-tab="description" onclick="prodOpenTab('description')">Description</button>
-        {%- if section.settings.show_specs -%}
+        {%- if section.settings.show_specs and specs_data != blank -%}
           <button class="prod-tab" role="tab" aria-selected="false" data-tab="specs" onclick="prodOpenTab('specs')">Specifications</button>
         {%- endif -%}
         {%- if section.settings.show_compat -%}
@@ -384,30 +386,21 @@
         {%- endif -%}
       </div>
 
-      {%- comment -%} Specifications {%- endcomment -%}
-      {%- if section.settings.show_specs -%}
+      {%- comment -%}
+        Specifications — fully dynamic from the `specs.table` JSON metafield (type: JSON).
+        Liquid emits the raw JSON; JavaScript parses it and renders the rows.
+        No values are hardcoded in the theme, so it works for every product automatically.
+      {%- endcomment -%}
+      {%- if section.settings.show_specs and specs_data != blank -%}
         <div class="prod-tab-panel" id="tabpanel-specs" role="tabpanel" style="display:none;">
           <div class="prod-tab-body">
-            <table class="prod-specs-table">
-              <tbody>
-                {%- for block in section.blocks -%}
-                  {%- if block.type == 'spec_row' -%}
-                    <tr {{ block.shopify_attributes }}>
-                      <td>{{ block.settings.label }}</td>
-                      <td>{{ block.settings.value }}</td>
-                    </tr>
-                  {%- endif -%}
-                {%- endfor -%}
-                {%- if product.metafields.specs.material != blank -%}<tr><td>Material</td><td>{{ product.metafields.specs.material }}</td></tr>{%- endif -%}
-                {%- if product.metafields.specs.capacity != blank -%}<tr><td>Capacity</td><td>{{ product.metafields.specs.capacity }}</td></tr>{%- endif -%}
-                {%- if product.metafields.specs.base_thickness != blank -%}<tr><td>Base Thickness</td><td>{{ product.metafields.specs.base_thickness }}</td></tr>{%- endif -%}
-                {%- if product.metafields.specs.coating != blank -%}<tr><td>Coating</td><td>{{ product.metafields.specs.coating }}</td></tr>{%- endif -%}
-                {%- if product.metafields.specs.weight != blank -%}<tr><td>Weight</td><td>{{ product.metafields.specs.weight }}</td></tr>{%- endif -%}
-                {%- if product.metafields.specs.warranty != blank -%}<tr><td>Warranty</td><td>{{ product.metafields.specs.warranty }}</td></tr>{%- endif -%}
-                {%- if product.metafields.specs.certification != blank -%}<tr><td>Certification</td><td>{{ product.metafields.specs.certification }}</td></tr>{%- endif -%}
-                {%- if product.metafields.specs.dimensions != blank -%}<tr><td>Dimensions</td><td>{{ product.metafields.specs.dimensions }}</td></tr>{%- endif -%}
-              </tbody>
+            <table class="prod-specs-table" data-specs-table hidden>
+              <tbody data-specs-body></tbody>
             </table>
+            {%- comment -%} Source of truth: the product's JSON metafield, serialised for the parser. {%- endcomment -%}
+            <script type="application/json" data-specs-json>
+              {{- specs_data | json -}}
+            </script>
           </div>
         </div>
       {%- endif -%}
@@ -821,6 +814,58 @@
     });
   };
 
+  /* ── SPECIFICATIONS (dynamic from JSON metafield) ── */
+  (function renderSpecs() {
+    var src = document.querySelector('[data-specs-json]');
+    var table = document.querySelector('[data-specs-table]');
+    var body = document.querySelector('[data-specs-body]');
+    if (!src || !table || !body) return;
+
+    // 1. Read + 2. Parse the JSON metafield. Tolerate either a JSON-typed
+    // metafield (already an object) or a text metafield holding a JSON string.
+    var data;
+    try {
+      data = JSON.parse(src.textContent);
+      if (typeof data === 'string') { data = JSON.parse(data); }
+    } catch (e) {
+      data = null;
+    }
+
+    // Normalise into [label, value] pairs, preserving the metafield's order.
+    var rows = [];
+    if (Array.isArray(data)) {
+      // Supports [{ "label": "...", "value": "..." }, ...] as well.
+      data.forEach(function(item) {
+        if (item && typeof item === 'object') {
+          var label = item.label != null ? item.label : item.name;
+          rows.push([label, item.value]);
+        }
+      });
+    } else if (data && typeof data === 'object') {
+      Object.keys(data).forEach(function(key) { rows.push([key, data[key]]); });
+    }
+
+    // 3. Render — skip any row whose label or value is empty. Unlimited rows.
+    var html = '';
+    rows.forEach(function(pair) {
+      var label = (pair[0] == null ? '' : String(pair[0])).trim();
+      var value = (pair[1] == null ? '' : String(pair[1])).trim();
+      if (!label || !value) return;
+      html += '<tr><td>' + escapeHtml(label) + '</td><td>' + escapeHtml(value) + '</td></tr>';
+    });
+
+    if (html) {
+      body.innerHTML = html;
+      table.hidden = false;
+    } // else: leave hidden — Liquid already omitted the tab when the metafield was empty.
+
+    function escapeHtml(s) {
+      return s.replace(/[&<>"']/g, function(c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+  })();
+
   /* ── WISHLIST ── */
   function getWL() { try { return JSON.parse(localStorage.getItem('relicaWL') || '[]'); } catch(e) { return []; } }
   function saveWL(l) { try { localStorage.setItem('relicaWL', JSON.stringify(l)); } catch(e) {} }
@@ -931,16 +976,6 @@
     { "type": "text", "id": "related_eyebrow", "label": "Eyebrow text", "default": "From the Same Series" },
     { "type": "text", "id": "related_title_plain", "label": "Heading — plain", "default": "You May Also" },
     { "type": "text", "id": "related_title_italic", "label": "Heading — italic", "default": "Like" }
-  ],
-  "blocks": [
-    {
-      "type": "spec_row",
-      "name": "Specification Row",
-      "settings": [
-        { "type": "text", "id": "label", "label": "Label", "default": "Material" },
-        { "type": "text", "id": "value", "label": "Value", "default": "Die-Cast Aluminium" }
-      ]
-    }
   ],
   "enabled_on": {
     "templates": ["product"]

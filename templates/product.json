@@ -2,45 +2,6 @@
   "sections": {
     "product_main": {
       "type": "product-main",
-      "blocks": {
-        "spec_material": {
-          "type": "spec_row",
-          "settings": { "label": "Material", "value": "Die-Cast Aluminium" }
-        },
-        "spec_coating": {
-          "type": "spec_row",
-          "settings": { "label": "Coating", "value": "PFOA-Free Non-Stick (3-layer)" }
-        },
-        "spec_base": {
-          "type": "spec_row",
-          "settings": { "label": "Base Thickness", "value": "4.5 mm" }
-        },
-        "spec_warranty": {
-          "type": "spec_row",
-          "settings": { "label": "Warranty", "value": "5 Years (cookware)" }
-        },
-        "spec_cert": {
-          "type": "spec_row",
-          "settings": { "label": "Certification", "value": "ISI Certified (IS 14101)" }
-        },
-        "spec_handle": {
-          "type": "spec_row",
-          "settings": { "label": "Handle", "value": "Bakelite, heat-resistant" }
-        },
-        "spec_oven": {
-          "type": "spec_row",
-          "settings": { "label": "Oven Safe", "value": "Up to 180°C (without lid)" }
-        }
-      },
-      "block_order": [
-        "spec_material",
-        "spec_coating",
-        "spec_base",
-        "spec_warranty",
-        "spec_cert",
-        "spec_handle",
-        "spec_oven"
-      ],
       "settings": {
         "trust1": "Up to 5-Year Warranty",
         "trust2": "ISI Certified · PFOA Free",
